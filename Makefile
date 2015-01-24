@@ -1,6 +1,6 @@
 CXX		:= c++
 DEBUG		:= 1
-CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -g -DDEBUG=$(DEBUG)
+CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -DDEBUG=$(DEBUG)
 
 .PHONY: all
 

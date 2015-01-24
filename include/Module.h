@@ -1,0 +1,28 @@
+/**
+ * @file    Module.h
+ *
+ * Class definition for a generic Module
+ *
+ * @author  Clay Freeman
+ * @date    January 23, 2015
+ */
+
+#ifndef _MODULE_H
+#define _MODULE_H
+
+#include <string>
+
+class Module {
+  protected:
+    // Each Module needs a name property
+    std::string name = "";
+
+  public:
+    virtual ~Module() {}
+    // Each Module needs a getter for its name
+    std::string getName();
+    // Each Module needs an isInstantiated method
+    virtual bool isInstantiated() { return true; }
+};
+
+#endif

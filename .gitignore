@@ -1,4 +1,4 @@
-modules
-obj
-main
 *.dSYM
+*.so
+main
+obj

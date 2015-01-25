@@ -12,11 +12,12 @@
 
 #include <vector>
 #include "include/Module.h"
+#include "include/ModuleInstance.h"
 
 class ModuleManagement {
   private:
     // Declare storage for loaded modules
-    static std::vector<Module*> modules;
+    static std::vector<ModuleInstance*> modules;
     // Prevent this class from being instantiated
     ModuleManagement();
     static std::string getBasename(std::string name);

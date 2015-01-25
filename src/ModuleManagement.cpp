@@ -14,10 +14,12 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "include/Module.h"
+#include "include/ModuleInstance.h"
 #include "include/ModuleManagement.h"
 
 // Initialize the modules vector
-std::vector<Module*> ModuleManagement::modules = {};
+std::vector<ModuleInstance*> ModuleManagement::modules = {};
 
 /**
  * @brief Constructor
@@ -35,9 +37,9 @@ ModuleManagement::ModuleManagement() {
  */
 ModuleManagement::~ModuleManagement() {
   if (DEBUG == 1) std::cout << "DEBUG: Destructing ModuleManagement class\n";
-  for (Module* m : ModuleManagement::modules) {
+  for (ModuleInstance* m : ModuleManagement::modules) {
     // Unload each Module
-    ModuleManagement::unloadModule(m->getName());
+    ModuleManagement::unloadModule(m->module->getName());
   }
 }
 
@@ -90,10 +92,10 @@ std::string ModuleManagement::getBasename(std::string name) {
  * @return A pointer to the Module
  */
 Module* ModuleManagement::getModuleByName(std::string name) {
-  for (Module* m : ModuleManagement::modules) {
-    if (m->getName() == name) {
+  for (ModuleInstance* m : ModuleManagement::modules) {
+    if (m->module->getName() == name) {
       if (DEBUG == 1) std::cout << "DEBUG: Fetched Module \"" << name << "\"\n";
-      return m;
+      return m->module;
     }
   }
   return nullptr;
@@ -133,11 +135,11 @@ bool ModuleManagement::loadModule(std::string name) {
         // Verify that the module can be loaded
         bool load = module->isInstantiated();
         if (load == true) {
-          ModuleManagement::modules.push_back(module);
+          ModuleManagement::modules.push_back(new ModuleInstance {module, obj});
           return true;
         }
         else {
-          delete[] module;
+          delete module;
           dlclose(obj);
 
           e += "Got false from ";
@@ -147,7 +149,7 @@ bool ModuleManagement::loadModule(std::string name) {
         }
       }
       else {
-        if (module != nullptr) delete[] module;
+        if (module != nullptr) delete module;
         dlclose(obj);
 
         e += "Internal logic error in module \"";
@@ -203,13 +205,17 @@ bool ModuleManagement::unloadModule(std::string name) {
   if (DEBUG == 1) std::cout << "DEBUG: Unloading Module \"" << name
     << "\" ...\n";
   // Iterate over each Module
-  for (std::vector<Module*>::iterator i = ModuleManagement::modules.begin();
-       i != ModuleManagement::modules.end(); ++i) {
-    if ((*i)->getName() == name) {
-      // If this Module matches, delete its memory and erase from the vector
+  for (std::vector<ModuleInstance*>::iterator i =
+       ModuleManagement::modules.begin(); i !=
+       ModuleManagement::modules.end(); ++i) {
+    if ((*i)->module->getName() == name) {
+      // If this Module matches, delete its memory
+      delete (*i)->module;
+      dlclose((*i)->object);
       delete *i;
-      ModuleManagement::modules.erase(i);
 
+      // Remove the ModuleInstance from the modules vector
+      ModuleManagement::modules.erase(i);
       return true;
     }
   }

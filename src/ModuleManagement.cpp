@@ -11,6 +11,7 @@
 #include <dlfcn.h>
 #include <iostream>
 #include <libgen.h>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -19,29 +20,7 @@
 #include "include/ModuleManagement.h"
 
 // Initialize the modules vector
-std::vector<ModuleInstance*> ModuleManagement::modules = {};
-
-/**
- * @brief Constructor
- *
- * Just a constructor stub for debugging purposes
- */
-ModuleManagement::ModuleManagement() {
-  if (DEBUG == 1) std::cout << "DEBUG: Constructing ModuleManagement class\n";
-}
-
-/**
- * @brief Destructor
- *
- * Unloads each Module in the modules vector when ModuleManagement is destructed
- */
-ModuleManagement::~ModuleManagement() {
-  if (DEBUG == 1) std::cout << "DEBUG: Destructing ModuleManagement class\n";
-  for (ModuleInstance* m : ModuleManagement::modules) {
-    // Unload each Module
-    ModuleManagement::unloadModule(m->module->getName());
-  }
-}
+std::vector<std::shared_ptr<ModuleInstance>> ModuleManagement::modules{};
 
 /**
  * @brief Get Basename
@@ -91,8 +70,8 @@ std::string ModuleManagement::getBasename(std::string name) {
  *
  * @return A pointer to the Module
  */
-Module* ModuleManagement::getModuleByName(std::string name) {
-  for (ModuleInstance* m : ModuleManagement::modules) {
+std::shared_ptr<Module> ModuleManagement::getModuleByName(std::string name) {
+  for (std::shared_ptr<ModuleInstance> m : ModuleManagement::modules) {
     if (m->module->getName() == name) {
       if (DEBUG == 1) std::cout << "DEBUG: Fetched Module \"" << name << "\"\n";
       return m->module;
@@ -135,7 +114,12 @@ bool ModuleManagement::loadModule(std::string name) {
         // Verify that the module can be loaded
         bool load = module->isInstantiated();
         if (load == true) {
-          ModuleManagement::modules.push_back(new ModuleInstance {module, obj});
+          ModuleManagement::modules.push_back(std::shared_ptr<ModuleInstance>{
+            new ModuleInstance {
+              std::shared_ptr<Module>{module},
+              std::unique_ptr<void, void(*)(void*)>{obj, &delete_dlobject<void>}
+            }
+          });
           return true;
         }
         else {
@@ -205,15 +189,10 @@ bool ModuleManagement::unloadModule(std::string name) {
   if (DEBUG == 1) std::cout << "DEBUG: Unloading Module \"" << name
     << "\" ...\n";
   // Iterate over each Module
-  for (std::vector<ModuleInstance*>::iterator i =
+  for (std::vector<std::shared_ptr<ModuleInstance>>::iterator i =
        ModuleManagement::modules.begin(); i !=
        ModuleManagement::modules.end(); ++i) {
     if ((*i)->module->getName() == name) {
-      // If this Module matches, delete its memory
-      delete (*i)->module;
-      dlclose((*i)->object);
-      delete *i;
-
       // Remove the ModuleInstance from the modules vector
       ModuleManagement::modules.erase(i);
       return true;

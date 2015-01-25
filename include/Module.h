@@ -10,6 +10,7 @@
 #ifndef _MODULE_H
 #define _MODULE_H
 
+#include <iostream>
 #include <string>
 
 class Module {
@@ -18,7 +19,12 @@ class Module {
     std::string name = "";
 
   public:
-    virtual ~Module() {}
+    Module() {
+      if (DEBUG == 1) std::cout << "DEBUG: Default Module()\n";
+    }
+    virtual ~Module() {
+      if (DEBUG == 1) std::cout << "DEBUG: Default ~Module()\n";
+    }
     // Each Module needs a getter for its name
     std::string getName();
     // Each Module needs an isInstantiated method

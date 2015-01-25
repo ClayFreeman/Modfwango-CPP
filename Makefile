@@ -1,5 +1,5 @@
 CXX		:= c++
-DEBUG		:= 1
+DEBUG		:= 0
 CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -DDEBUG=$(DEBUG)
 
 .PHONY: all

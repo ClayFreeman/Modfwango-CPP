@@ -25,7 +25,14 @@ int main() {
     // Something went wrong loading the shared object
     std::cout << e.what() << '\n';
   }
-  // Unload the Test Module
+
+  /**
+   *   I'd like to look for a better way of doing this; An ideal solution would
+   * be finding a way to make the destructor call for ModuleManagement, but it
+   * is a static class.  The only other option I see is making it an instance
+   * class, but I would rather not have it instantiable
+   */
   ModuleManagement::unloadModule("Test");
+
   return 0;
 }

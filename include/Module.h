@@ -26,7 +26,7 @@ class Module {
       if (DEBUG == 1) std::cout << "DEBUG: Default ~Module()\n";
     }
     // Each Module needs a getter for its name
-    std::string getName();
+    std::string getName() { return this->name; }
     // Each Module needs an isInstantiated method
     virtual bool isInstantiated() { return true; }
 };

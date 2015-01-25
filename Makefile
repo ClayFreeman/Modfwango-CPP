@@ -10,18 +10,13 @@ clean:
 	@echo "Cleaning up ..."
 	@rm -rf modules obj main
 
-main: obj/Module.o obj/ModuleManagement.o main.cpp
+main: obj/ModuleManagement.o main.cpp
 	@mkdir -p obj
 	@echo "Compiling main.cpp ..."
 	@$(CXX) $(CPPFLAGS) main.cpp obj/*.o -o obj/main
 	@mv obj/main .
 
-obj/Module.o: src/Module.cpp
-	@mkdir -p obj
-	@echo "Compiling src/Module.cpp ..."
-	@$(CXX) $(CPPFLAGS) -c src/Module.cpp -o obj/Module.o
-
-obj/ModuleManagement.o: obj/Module.o src/ModuleManagement.cpp
+obj/ModuleManagement.o: src/ModuleManagement.cpp
 	@mkdir -p obj
 	@echo "Compiling src/ModuleManagement.cpp ..."
 	@$(CXX) $(CPPFLAGS) -c src/ModuleManagement.cpp -o \

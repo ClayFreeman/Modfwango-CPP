@@ -3,22 +3,22 @@ CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -DDEBUG=$(CDEBUG)
 CXX		:= c++
 CLEANO		:= $(shell find . -type f -name "*.o" | sed 's/^\.\///')
 CLEANSO		:= $(shell find . -type f -name "*.so" | sed 's/^\.\///')
+DEPEND		:= $(shell find src -type f -name "*.cpp" -maxdepth 1)
+DEPEND		:= $(shell echo $(DEPEND) | sed 's/cpp$$/o/')
 MODULES		:= $(shell find src/modules -type f -name "*.cpp")
 MODULES		:= $(shell echo $(MODULES) | sed 's/cpp$$/so/')
 
 .PHONY:		all clean modules
-
 all:		main modules
+modules:	$(MODULES)
 
 clean:
 	@$(foreach item,$(CLEANO),echo $(item); rm -f $(item);)
 	@$(foreach item,$(CLEANSO),echo $(item); rm -f $(item);)
 
-main:		src/ModuleManagement.o main.o
+main:		$(DEPEND) main.o
 	@echo " [LNK] $@ ..."
 	@$(CXX) $(CPPFLAGS) -o main $^
-
-modules:	$(MODULES)
 
 %.so:		%.cpp
 	@echo " [CXX] $@ ..."

@@ -1,30 +1,29 @@
+CDEBUG		:= 0
+CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -DDEBUG=$(CDEBUG)
 CXX		:= c++
-DEBUG		:= 0
-CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -DDEBUG=$(DEBUG)
+CLEANO		:= $(shell find . -type f -name "*.o" | sed 's/^\.\///')
+CLEANSO		:= $(shell find . -type f -name "*.so" | sed 's/^\.\///')
+MODULES		:= $(shell find src/modules -type f -name "*.cpp")
+MODULES		:= $(shell echo $(MODULES) | sed 's/cpp$$/so/')
 
-.PHONY: all
+.PHONY:		all clean modules
 
-all: modules main
+all:		main modules
 
 clean:
-	@echo "Cleaning up ..."
-	@rm -rf modules obj main
+	@$(foreach item,$(CLEANO),echo $(item); rm -f $(item);)
+	@$(foreach item,$(CLEANSO),echo $(item); rm -f $(item);)
 
-main: obj/ModuleManagement.o main.cpp
-	@mkdir -p obj
-	@echo "Compiling main.cpp ..."
-	@$(CXX) $(CPPFLAGS) main.cpp obj/*.o -o obj/main
-	@mv obj/main .
+main:		src/ModuleManagement.o main.o
+	@echo " [LNK] $@ ..."
+	@$(CXX) $(CPPFLAGS) -o main $^
 
-obj/ModuleManagement.o: src/ModuleManagement.cpp
-	@mkdir -p obj
-	@echo "Compiling src/ModuleManagement.cpp ..."
-	@$(CXX) $(CPPFLAGS) -c src/ModuleManagement.cpp -o \
-	  obj/ModuleManagement.o
+modules:	$(MODULES)
 
-modules: modules/Test.so
+%.so:		%.cpp
+	@echo " [CXX] $@ ..."
+	@$(CXX) $(CPPFLAGS) -shared -o $@ $^
 
-modules/Test.so: src/modules/Test.cpp
-	@mkdir -p modules
-	@echo "Compiling module src/modules/Test.cpp ..."
-	@$(CXX) $(CPPFLAGS) -shared src/modules/Test.cpp -o modules/Test.so
+%.o:		%.cpp
+	@echo " [CXX] $@ ..."
+	@$(CXX) $(CPPFLAGS) -c -o $@ $^

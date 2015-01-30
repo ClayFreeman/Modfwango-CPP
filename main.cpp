@@ -15,7 +15,7 @@
 int main() {
   try {
     // Attempt to load Module Test.so in the modules directory
-    ModuleManagement::loadModule("modules/Test.so");
+    ModuleManagement::loadModule("src/modules/Test.so");
   }
   catch (std::logic_error e) {
     // Something went wrong with the Module; tell the developer

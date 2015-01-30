@@ -11,10 +11,14 @@ MODULES		:= $(shell echo $(MODULES) | sed 's/cpp$$/so/')
 .PHONY:		all clean modules
 all:		main modules
 modules:	$(MODULES)
+#	@mkdir -p modules
+#	@$(foreach item,$(MODULES),mv $(item) $(shell echo $(item) | \
+#	  sed 's/src\///');)
 
 clean:
 	@$(foreach item,$(CLEANO),echo $(item); rm -f $(item);)
 	@$(foreach item,$(CLEANSO),echo $(item); rm -f $(item);)
+	@rm -f main
 
 main:		$(DEPEND) main.o
 	@echo " [LNK] $@ ..."

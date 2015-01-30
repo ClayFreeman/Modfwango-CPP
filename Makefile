@@ -18,7 +18,7 @@ clean:
 
 main:		$(DEPEND) main.o
 	@echo " [LNK] $@ ..."
-	@$(CXX) $(CPPFLAGS) -o main $^
+	@$(CXX) $(CPPFLAGS) -o main -ldl $^
 
 %.so:		%.cpp
 	@echo " [CXX] $@ ..."

@@ -1,4 +1,4 @@
-CDEBUG		:= 0
+CDEBUG		:= 1
 CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -DDEBUG=$(CDEBUG)
 CXX		:= c++
 CLEANO		:= $(shell find . -type f -name "*.o" | sed 's/^\.\///')

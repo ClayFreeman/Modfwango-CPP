@@ -18,11 +18,11 @@ clean:
 
 main:		$(DEPEND) main.o
 	@echo " [LNK] $@ ..."
-	@$(CXX) $(CPPFLAGS) -o main -ldl $^
+	@$(CXX) $(CPPFLAGS) -o main $^ -ldl
 
 %.so:		%.cpp
 	@echo " [CXX] $@ ..."
-	@$(CXX) $(CPPFLAGS) -shared -o $@ $^
+	@$(CXX) $(CPPFLAGS) -fPIC -shared -o $@ $^
 
 %.o:		%.cpp
 	@echo " [CXX] $@ ..."

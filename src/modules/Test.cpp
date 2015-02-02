@@ -19,7 +19,6 @@ class Test : public Module {
     ~Test() { if (DEBUG == 1) std::cout << "DEBUG: ~Test()\n"; }
     // Overload the isInstantiated() method
     bool isInstantiated();
-    void hello();
 };
 
 /**
@@ -31,17 +30,8 @@ class Test : public Module {
  * @return true if loadable, false otherwise
  */
 bool Test::isInstantiated() {
-  this->hello();
-  return true;
-}
-
-/**
- * @brief Hello
- *
- * Prints "Hello, World!\n" to std::cout
- */
-void Test::hello() {
   std::cout << "Hello, World!\n";
+  return true;
 }
 
 /**

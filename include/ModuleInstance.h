@@ -24,8 +24,8 @@ void delete_dlobject(void* p) {
 class ModuleInstance {
   private:
     // Make sure copying is disallowed
-    ModuleInstance(const ModuleInstance&) {}
-    ModuleInstance& operator= (const ModuleInstance&) {}
+    ModuleInstance(const ModuleInstance&);
+    ModuleInstance& operator= (const ModuleInstance&);
   public:
     // Declare storage for Module
     std::shared_ptr<Module> module;

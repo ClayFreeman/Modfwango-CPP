@@ -16,8 +16,8 @@
 class Module {
   private:
     // Make sure copying is disallowed
-    Module(const Module&) {}
-    Module& operator= (const Module&) {}
+    Module(const Module&);
+    Module& operator= (const Module&);
   protected:
     // Each Module needs a name property
     std::string name = "";

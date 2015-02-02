@@ -54,4 +54,4 @@ void Test::hello() {
  *
  * @return A pointer to this Module
  */
-extern "C" Module* _load() { return new Test; }
+extern "C" inline Module* _load() { return new Test; }

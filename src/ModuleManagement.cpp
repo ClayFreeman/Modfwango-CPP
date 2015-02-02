@@ -117,7 +117,7 @@ bool ModuleManagement::loadModule(std::string name) {
           ModuleManagement::modules.push_back(std::shared_ptr<ModuleInstance>{
             new ModuleInstance {
               std::shared_ptr<Module>{module},
-              std::unique_ptr<void, void(*)(void*)>{obj, &delete_dlobject<void>}
+              std::shared_ptr<void>{obj, &delete_dlobject<void>}
             }
           });
           return true;

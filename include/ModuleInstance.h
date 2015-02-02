@@ -22,11 +22,21 @@ void delete_dlobject(void* p) {
 }
 
 class ModuleInstance {
+  private:
+    // Make sure copying is disallowed
+    ModuleInstance(const ModuleInstance&) {}
+    ModuleInstance& operator= (const ModuleInstance&) {}
   public:
     // Declare storage for Module
     std::shared_ptr<Module> module;
     // Declare storage for the dlopen() object
-    std::unique_ptr<void, void(*)(void*)> object;
+    std::shared_ptr<void> object;
+    // Define default constructor to accept module and object
+    ModuleInstance(const std::shared_ptr<Module>& m,
+        const std::shared_ptr<void>& o) {
+      this->module = m;
+      this->object = o;
+    }
     // Define destructor to correctly destroy elements
     ~ModuleInstance() {
       if (DEBUG == 1) std::cout << "DEBUG: Default ~ModuleInstance() ...\n";

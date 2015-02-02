@@ -22,9 +22,8 @@ class ModuleManagement {
     // Prevent this class from being instantiated
     ModuleManagement() {}
     static std::string getBasename(std::string name);
-    static std::shared_ptr<Module> getModuleByName(std::string name);
-
   public:
+    static std::shared_ptr<Module> getModuleByName(std::string name);
     static bool loadModule(std::string name);
     static bool reloadModule(std::string name);
     static bool unloadModule(std::string name);

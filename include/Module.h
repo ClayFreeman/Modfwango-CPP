@@ -14,10 +14,13 @@
 #include <string>
 
 class Module {
+  private:
+    // Make sure copying is disallowed
+    Module(const Module&) {}
+    Module& operator= (const Module&) {}
   protected:
     // Each Module needs a name property
     std::string name = "";
-
   public:
     Module() {
       if (DEBUG == 1) std::cout << "DEBUG: Default Module()\n";

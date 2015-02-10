@@ -1,7 +1,7 @@
 Modfwango-C++
 =============
 
-Modfwango-C++ is an in-progress, feature-incomplete port of the
+Modfwango-C++ is an in-progress, feature-incomplete C++ port of the
 [Modfwango](http://modfwango.com) framework.  This repository is currently very
 unstable, and APIs are likely to change.  When complete, this framework will be
 the official C++ companion to the PHP edition.  The end goal is the same: to

@@ -1,11 +1,12 @@
 /**
-* @file    ModuleInstance.h
-*
-* Class definition for ModuleInstance
-*
-* @author  Clay Freeman
-* @date    January 24, 2015
-*/
+ * @file  ModuleInstance.h
+ * @brief ModuleInstance
+ *
+ * Class definition for ModuleInstance
+ *
+ * @author  Clay Freeman
+ * @date    January 24, 2015
+ */
 
 #ifndef _MODULEINSTANCE_H
 #define _MODULEINSTANCE_H

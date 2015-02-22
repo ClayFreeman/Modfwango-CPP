@@ -1,5 +1,6 @@
 /**
- * @file    Module.h
+ * @file  Module.h
+ * @brief Module
  *
  * Class definition for a generic Module
  *
@@ -15,12 +16,18 @@
 
 class Module {
   private:
+    // Each Module needs a name property
+    std::string name = "";
     // Make sure copying is disallowed
     Module(const Module&);
     Module& operator= (const Module&);
   protected:
-    // Each Module needs a name property
-    std::string name = "";
+    void setName(std::string name) {
+      // If the name wasn't set already ...
+      if (this->name == std::string{})
+        // set the name to the provided value
+        this->name = name;
+    }
   public:
     Module() {
       if (DEBUG == 1) std::cout << "DEBUG: Default Module()\n";

@@ -1,5 +1,6 @@
 /**
- * @file    ModuleManagement.cpp
+ * @file  ModuleManagement.cpp
+ * @brief ModuleManagement
  *
  * Method implementations for ModuleManagement
  *

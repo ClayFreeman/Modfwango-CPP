@@ -1,5 +1,6 @@
 /**
- * @file    ModuleManagement.h
+ * @file  ModuleManagement.h
+ * @brief ModuleManagement
  *
  * Class definition for ModuleManagement
  *

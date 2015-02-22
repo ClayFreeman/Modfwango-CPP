@@ -24,6 +24,9 @@ main:		$(DEPEND) main.o
 	@echo " [LNK] $@ ..."
 	@$(CXX) $(CPPFLAGS) -o main $^ -ldl
 
+test:		main
+	@valgrind -v --tool=memcheck --leak-check=full --dsymutil=yes ./main
+
 %.so:		%.cpp
 	@echo " [CXX] $@ ..."
 	@$(CXX) $(CPPFLAGS) -fPIC -shared -o $@ $^

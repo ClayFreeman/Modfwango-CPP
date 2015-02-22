@@ -14,7 +14,7 @@
 class Test : public Module {
   public:
     // Initialize the name property
-    Test() { this->name = "Test"; }
+    Test() { this->setName("Test"); }
     // Demonstrate overriding the destructor
     ~Test() { if (DEBUG == 1) std::cout << "DEBUG: ~Test()\n"; }
     // Overload the isInstantiated() method

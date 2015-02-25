@@ -16,9 +16,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include "include/Module.h"
-#include "include/ModuleInstance.h"
-#include "include/ModuleManagement.h"
+#include "../include/Module.h"
+#include "../include/ModuleInstance.h"
+#include "../include/ModuleManagement.h"
 
 // Initialize the modules vector
 std::vector<std::shared_ptr<ModuleInstance>> ModuleManagement::modules{};

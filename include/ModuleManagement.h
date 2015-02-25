@@ -13,8 +13,8 @@
 
 #include <memory>
 #include <vector>
-#include "include/Module.h"
-#include "include/ModuleInstance.h"
+#include "Module.h"
+#include "ModuleInstance.h"
 
 class ModuleManagement {
   private:

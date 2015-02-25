@@ -1,36 +1,96 @@
-CDEBUG		:= 1
-CPPFLAGS	:= -std=c++11 -Wall -Wextra -pedantic -I. -DDEBUG=$(CDEBUG)
-CXX		:= c++
-CLEANO		:= $(shell find . -type f -name "*.o" | sed 's/^\.\///')
-CLEANSO		:= $(shell find . -type f -name "*.so" | sed 's/^\.\///')
-DEPEND		:= $(shell find src -maxdepth 1 -type f -name "*.cpp" \
-                        | sed 's/cpp$$/o/')
-MODULES		:= $(shell find src/modules -maxdepth 1 -type f -name "*.cpp" \
-                        | sed 's/cpp$$/so/')
+# Dynamic Makefile (written by Clay Freeman)
+# License: http://creativecommons.org/licenses/by-sa/4.0/
 
-.PHONY:		all clean modules
-all:		main modules
-modules:	$(MODULES)
-#	@mkdir -p modules
-#	@$(foreach item,$(MODULES),mv $(item) $(shell echo $(item) | \
-#	  sed 's/src\///');)
+#################################### CONFIG ####################################
 
+# BASH holds the executable for bash.  This is needed for color output.
+# CPPCHECK holds the executable to check your source files.
+# You can change CXX to clang if you wish, or edit the compiler flags CXXFLAGS.
+# VALGRIND holds the executable to test memory leaks.
+# ZIP holds the executable to make ZIPs.  Edit ZIPFLAGS if -q causes problems.
+BASH		:= bash
+BASHFLAGS	:= -c
+CPPCHECK	:= cppcheck
+CPPCHECKFLAGS	:=
+CXX		:= g++
+CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic
+MODULESDIR	:= ./src/modules
+VALGRIND	:= valgrind
+VALGRINDFLAGS	:= -v --tool=memcheck --leak-check=full --dsymutil=yes
+ZIP		:= zip
+ZIPFLAGS	:= -q
+
+# Color codes for colored output.  These can be changed, but at your own risk.
+ERROR		:= \x1b[31;01m
+OK		:= \x1b[32;01m
+RESET		:= \x1b[0m
+WARN		:= \x1b[33;01m
+
+################################### INTERNAL ###################################
+
+# Don't touch these variables
+RWILDCARD	 = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard \
+			$(addsuffix *, $1)),$(call RWILDCARD,$d/,$2))
+DEBUG		:= 0
+DEPENDCPP	:= $(subst ./,,$(call RWILDCARD,./,*.cpp))
+DEPENDMODULES	:= $(subst ./,,$(call RWILDCARD,$(MODULESDIR),*.cpp))
+$(foreach item,$(DEPENDMODULES), \
+	$(eval DEPENDCPP := $(filter-out $(item),$(DEPENDCPP))) \
+)
+DEPENDH		:= $(subst ./,,$(call RWILDCARD,./,*.h))
+DEPENDO		:= $(patsubst %.cpp,%.o, $(DEPENDCPP))
+DEPENDSO	:= $(patsubst %.cpp,%.so, $(DEPENDMODULES))
+OOP		:= $(shell basename "`pwd`")
+CLEAN		:= $(subst ./,,$(call RWILDCARD,./,*.dSYM)) $(DEPENDO) \
+			$(DEPENDSO) $(OOP) $(OOP).zip
+
+  ############################### UTIL TARGETS ###############################
+
+# Builds and links the application
+all:		$(OOP) $(DEPENDSO)
+# Builds with macro DEBUG set to 1 instead of 0
+debug:		.debug all
+.debug:
+	$(eval DEBUG := 1)
+# Builds a ZIP file of your CPP/H/Makefile files
+zip:		$(OOP).zip
+# Remove any compiled or ZIP files if they exist
 clean:
-	@$(foreach item,$(CLEANO),echo $(item); rm -f $(item);)
-	@$(foreach item,$(CLEANSO),echo $(item); rm -f $(item);)
-	@rm -f main
+	@$(foreach item,$(CLEAN), $(BASH) $(BASHFLAGS) \
+		"if [ -a $(item) ]; then \
+			echo -e \"[$(ERROR)DEL$(RESET)] $(item)\"; \
+			rm -rf $(item); \
+		fi;"; \
+	)
+# Run cppcheck and valgrind to point out any potential mistakes in your code
+test:		$(OOP)
+	@$(foreach item,$(DEPENDCPP), \
+		$(BASH) $(BASHFLAGS) "printf \"[$(WARN)CHK$(RESET)] \""; \
+		$(CPPCHECK) $(CPPCHECKFLAGS) $(item); \
+	)
+	@$(BASH) $(BASHFLAGS) \
+		"echo -e \"[$(WARN)CHK$(RESET)] Press enter to run memcheck.\""
+	@read cont
+	@$(VALGRIND) $(VALGRINDFLAGS) ./$(OOP)
 
-main:		$(DEPEND) main.o
-	@echo " [LNK] $@ ..."
-	@$(CXX) $(CPPFLAGS) -o main $^ -ldl
+  ############################## BUILD TARGETS ###############################
 
-test:		main
-	@valgrind -v --tool=memcheck --leak-check=full --dsymutil=yes ./main
+# Links your application.  Depends on all applicable .o files
+$(OOP):		$(DEPENDO)
+	@$(BASH) $(BASHFLAGS) "echo -e \"[$(OK)LNK$(RESET)] $@ ...\""
+	@$(CXX) $(CXXFLAGS) -o $@ $^
+
+# Builds a ZIP file from your source files and Makefile
+$(OOP).zip:	$(DEPENDCPP) $(DEPENDH) Makefile
+	@rm -f $@
+	@$(BASH) $(BASHFLAGS) "echo -e \"[$(OK)ZIP$(RESET)] $@ ...\""
+	@$(ZIP) $(ZIPFLAGS) -r $@ $^
+
+# Builds any object file from a CPP file
+%.o:		%.cpp
+	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
+	@$(CXX) $(CXXFLAGS) -DDEBUG=$(DEBUG) -o $@ -c $^
 
 %.so:		%.cpp
-	@echo " [CXX] $@ ..."
-	@$(CXX) $(CPPFLAGS) -fPIC -shared -o $@ $^
-
-%.o:		%.cpp
-	@echo " [CXX] $@ ..."
-	@$(CXX) $(CPPFLAGS) -c -o $@ $^
+	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
+	@$(CXX) $(CXXFLAGS) -DDEBUG=$(DEBUG) -o $@ -fPIC -shared $^

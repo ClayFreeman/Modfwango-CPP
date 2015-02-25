@@ -14,7 +14,7 @@
 #include <dlfcn.h>
 #include <iostream>
 #include <memory>
-#include "include/Module.h"
+#include "Module.h"
 
 template<class T>
 void delete_dlobject(void* p) {

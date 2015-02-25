@@ -9,7 +9,7 @@
  */
 
 #include <iostream>
-#include "include/Module.h"
+#include "../../include/Module.h"
 
 class Test : public Module {
   public:

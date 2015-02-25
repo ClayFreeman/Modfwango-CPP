@@ -13,8 +13,9 @@ BASHFLAGS	:= -c
 CPPCHECK	:= cppcheck
 CPPCHECKFLAGS	:=
 CXX		:= g++
-CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic
+CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -DDEBUG=0
 MODULESDIR	:= ./src/modules
+OUT		 = main
 VALGRIND	:= valgrind
 VALGRINDFLAGS	:= -v --tool=memcheck --leak-check=full --dsymutil=yes
 ZIP		:= zip
@@ -31,7 +32,6 @@ WARN		:= \x1b[33;01m
 # Don't touch these variables
 RWILDCARD	 = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard \
 			$(addsuffix *, $1)),$(call RWILDCARD,$d/,$2))
-DEBUG		:= 0
 DEPENDCPP	:= $(subst ./,,$(call RWILDCARD,./,*.cpp))
 DEPENDMODULES	:= $(subst ./,,$(call RWILDCARD,$(MODULESDIR),*.cpp))
 $(foreach item,$(DEPENDMODULES), \
@@ -42,18 +42,19 @@ DEPENDO		:= $(patsubst %.cpp,%.o, $(DEPENDCPP))
 DEPENDSO	:= $(patsubst %.cpp,%.so, $(DEPENDMODULES))
 OOP		:= $(shell basename "`pwd`")
 CLEAN		:= $(subst ./,,$(call RWILDCARD,./,*.dSYM)) $(DEPENDO) \
-			$(DEPENDSO) $(OOP) $(OOP).zip
+			$(DEPENDSO) $(OUT) $(OUT).zip
 
   ############################### UTIL TARGETS ###############################
 
 # Builds and links the application
-all:		$(OOP) $(DEPENDSO)
+all:		$(OUT) $(DEPENDSO)
 # Builds with macro DEBUG set to 1 instead of 0
 debug:		.debug all
 .debug:
-	$(eval DEBUG := 1)
+	$(eval CXXFLAGS := $(filter-out -DDEBUG=%,$(CXXFLAGS)))
+	$(eval CXXFLAGS := $(CXXFLAGS) -g -DDEBUG=1)
 # Builds a ZIP file of your CPP/H/Makefile files
-zip:		$(OOP).zip
+zip:		$(OUT).zip
 # Remove any compiled or ZIP files if they exist
 clean:
 	@$(foreach item,$(CLEAN), $(BASH) $(BASHFLAGS) \
@@ -63,7 +64,7 @@ clean:
 		fi;"; \
 	)
 # Run cppcheck and valgrind to point out any potential mistakes in your code
-test:		$(OOP)
+test:		$(OUT)
 	@$(foreach item,$(DEPENDCPP), \
 		$(BASH) $(BASHFLAGS) "printf \"[$(WARN)CHK$(RESET)] \""; \
 		$(CPPCHECK) $(CPPCHECKFLAGS) $(item); \
@@ -71,17 +72,17 @@ test:		$(OOP)
 	@$(BASH) $(BASHFLAGS) \
 		"echo -e \"[$(WARN)CHK$(RESET)] Press enter to run memcheck.\""
 	@read cont
-	@$(VALGRIND) $(VALGRINDFLAGS) ./$(OOP)
+	@$(VALGRIND) $(VALGRINDFLAGS) ./$(OUT)
 
   ############################## BUILD TARGETS ###############################
 
 # Links your application.  Depends on all applicable .o files
-$(OOP):		$(DEPENDO)
+$(OUT):		$(DEPENDO)
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(OK)LNK$(RESET)] $@ ...\""
 	@$(CXX) $(CXXFLAGS) -o $@ $^
 
 # Builds a ZIP file from your source files and Makefile
-$(OOP).zip:	$(DEPENDCPP) $(DEPENDH) Makefile
+$(OUT).zip:	$(DEPENDCPP) $(DEPENDMODULES) $(DEPENDH) Makefile
 	@rm -f $@
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(OK)ZIP$(RESET)] $@ ...\""
 	@$(ZIP) $(ZIPFLAGS) -r $@ $^
@@ -89,8 +90,8 @@ $(OOP).zip:	$(DEPENDCPP) $(DEPENDH) Makefile
 # Builds any object file from a CPP file
 %.o:		%.cpp
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
-	@$(CXX) $(CXXFLAGS) -DDEBUG=$(DEBUG) -o $@ -c $^
+	@$(CXX) $(CXXFLAGS) -o $@ -c $^
 
 %.so:		%.cpp
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
-	@$(CXX) $(CXXFLAGS) -DDEBUG=$(DEBUG) -o $@ -fPIC -shared $^
+	@$(CXX) $(CXXFLAGS) -o $@ -fPIC -shared $^

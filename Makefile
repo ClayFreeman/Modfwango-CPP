@@ -94,6 +94,6 @@ $(OUT).zip:	$(DEPENDCPP) $(DEPENDMODULES) $(DEPENDH) Makefile
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
 	@$(CXX) $(CXXFLAGS) -o $@ -c $^
 
-%.so:		%.cpp $(DEPENDO)
+%.so:		%.cpp
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
 	@$(CXX) $(CXXFLAGS) -o $@ -shared $^

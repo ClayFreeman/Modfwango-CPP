@@ -22,15 +22,9 @@ class EventRegistration {
     EventRegistration& operator= (const EventRegistration&);
   public:
     EventRegistration(std::string parentModule,
-        void (*callback)(std::string, void*) = nullptr) {
-      this->parentModule = parentModule;
-      this->callback = callback;
-    }
+      void (*callback)(std::string, void*) = nullptr);
     const std::string& getParentModule() const { return this->parentModule; }
-    void call(const std::string& name, void* data) const {
-      if (this->callback != nullptr)
-        this->callback(name, data);
-    }
+    void call(const std::string& name, void* data) const;
 };
 
 #endif

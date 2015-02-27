@@ -8,13 +8,13 @@
  * @date       February 19, 2015
  */
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include "../include/Event.h"
 #include "../include/EventHandling.h"
 #include "../include/EventRegistration.h"
-#include "../include/Module.h"
 #include "../include/ModuleManagement.h"
 
 // Initialize the events map
@@ -97,11 +97,6 @@ bool EventHandling::registerForEvent(const std::string& name,
   if (EventHandling::events.count(name) > 0 &&
       (parentModule.length() == 0 ||
         ModuleManagement::getModuleByName(parentModule).get() != nullptr)) {
-    if (DEBUG == 1 && parentModule.length() > 0) std::cout
-      << "DEBUG: Registering Module \"" << parentModule << "\" for Event \""
-      << name << "\" ...\n";
-    else if (DEBUG == 1) std::cout << "DEBUG: Registering for Event \"" << name
-      << "\" ...\n";
     // Add the requested EventRegistration to the Event
     EventHandling::events[name]->addRegistration(priority,
       std::shared_ptr<EventRegistration>{new EventRegistration{
@@ -111,11 +106,6 @@ bool EventHandling::registerForEvent(const std::string& name,
     );
     status = true;
   }
-  else if (DEBUG == 1 && parentModule.length() > 0) std::cout
-    << "DEBUG: Problem registering for Event \"" << name << "\" with Module \""
-    << parentModule << "\"\n";
-  else if (DEBUG == 1) std::cout << "DEBUG: Problem registering for Event \""
-    << name << "\"\n";
   return status;
 }
 
@@ -179,10 +169,13 @@ bool EventHandling::triggerEvent(const std::string& name, void* data) {
  * @return true if the Events were found and destroyed, false otherwise
  */
 bool EventHandling::unregisterEvents(const std::string& parentModule) {
+  if (DEBUG == 1) std::cout << "DEBUG: Deleting Event(s) owned by Module \""
+    << parentModule << "\"\n";
+  bool status = false;
   for (auto& event : EventHandling::events)
     if (event.second->getParentModule() == parentModule)
-      EventHandling::destroyEvent(event.second->getName());
-  return false;
+      status = EventHandling::destroyEvent(event.second->getName()) || status;
+  return status;
 }
 
 /**
@@ -200,9 +193,6 @@ bool EventHandling::unregisterForEvent(const std::string& name,
     const std::string& parentModule) {
   bool status = false;
   if (EventHandling::events.count(name) > 0) {
-    if (DEBUG == 1 && parentModule.length() > 0) std::cout
-      << "DEBUG: Unregistering Module \"" << parentModule << "\" for Event \""
-      << name << "\" ...\n";
     // Call delRegistration for the given Event
     EventHandling::events[name]->delRegistration(parentModule);
     status = true;

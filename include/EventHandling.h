@@ -15,7 +15,6 @@
 #include <memory>
 #include <string>
 #include "Event.h"
-#include "Module.h"
 
 class EventHandling {
   private:

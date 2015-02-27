@@ -67,8 +67,7 @@ void Test::test_func(std::string name, void* data) {
     std::cout << "DEBUG: Event \"" << name
               << "\" callback received with data at address " << data << "\n";
     if (data != nullptr) {
-      std::cout << "DEBUG: (const char*) value \"" << (const char*)data
-                << "\"\n";
+      std::cout << "DEBUG: (const char*)\"" << (const char*)data << "\"\n";
     }
   }
 }

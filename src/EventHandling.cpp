@@ -131,12 +131,12 @@ bool EventHandling::registerForEvent(const std::string& name,
  * @return true if the Event was found and registration succeeded, false
  *   otherwise
  */
-bool EventHandling::registerPreprocessorForEvent(const std::string& name,
-    const std::string& parentModule, bool (*callback)(std::string),
-    const int& priority) {
-  // TODO:  Implement this method
-  return false;
-}
+// bool EventHandling::registerPreprocessorForEvent(const std::string& name,
+//     const std::string& parentModule, bool (*callback)(std::string),
+//     const int& priority) {
+//   // TODO:  Implement this method
+//   return false;
+// }
 
 /**
  * @brief Trigger Event
@@ -211,11 +211,11 @@ bool EventHandling::unregisterForEvent(const std::string& name,
  * @return true if the Event was found and Module unregistered, false
  *   otherwise
  */
-bool EventHandling::unregisterPreprocessorForEvent(const std::string& name,
-    const std::string& parentModule) {
-  // TODO:  Implement this method
-  return false;
-}
+// bool EventHandling::unregisterPreprocessorForEvent(const std::string& name,
+//     const std::string& parentModule) {
+//   // TODO:  Implement this method
+//   return false;
+// }
 
 /**
  * @brief Unregister Module

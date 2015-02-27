@@ -21,8 +21,9 @@ class Test : public Module {
     ~Test() { if (DEBUG == 1) std::cout << "DEBUG: ~Test()\n"; }
     // Overload the isInstantiated() method
     bool isInstantiated();
-    // Create an Event callback
+    // Create Event callbacks
     static void test_func(std::string name, void* data);
+    static void test_func1(std::string name, void* data);
 };
 
 /**
@@ -47,7 +48,7 @@ bool Test::isInstantiated() {
   EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
     &Test::test_func);
   EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
-    &Test::test_func, -1);
+    &Test::test_func1, -1);
   EventHandling::triggerEvent("TestScopeDeallocationEvent", (void*)("Hello"));
   EventHandling::unregisterForEvent("TestScopeDeallocationEvent",
     this->getName());
@@ -72,6 +73,19 @@ void Test::test_func(std::string name, void* data) {
       std::cout << "DEBUG: (const char*)\"" << (const char*)data << "\"\n";
     }
   }
+}
+
+/**
+ * @brief Test Function 1
+ *
+ * Calls test_func(...)
+ *
+ * @param      name The name of the originating Event
+ * @param[out] data The optional data given with the Event trigger
+ */
+void Test::test_func1(std::string name, void* data) {
+  if (DEBUG == 1) std::cout << "DEBUG: test_func1() called\n";
+  Test::test_func(name, data);
 }
 
 /**

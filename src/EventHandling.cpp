@@ -232,8 +232,8 @@ bool EventHandling::unregisterModule(const std::string& parentModule) {
   for (auto& event : EventHandling::events) {
     status = EventHandling::unregisterForEvent(event.second->getName(),
       parentModule) || status;
-    status = EventHandling::unregisterPreprocessorForEvent(
-      event.second->getName(), parentModule) || status;
+    // status = EventHandling::unregisterPreprocessorForEvent(
+    //   event.second->getName(), parentModule) || status;
   }
   return status;
 }

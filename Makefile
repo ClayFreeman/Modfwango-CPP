@@ -13,7 +13,7 @@ BASHFLAGS	:= -c
 CPPCHECK	:= cppcheck
 CPPCHECKFLAGS	:=
 CXX		:= g++
-CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -fPIC -rdynamic -O0 \
+CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -fPIC -rdynamic \
 			-DDEBUG=0
 LIBS		:= -ldl
 MODULESDIR	:= ./src/modules

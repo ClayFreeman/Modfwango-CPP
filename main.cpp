@@ -14,6 +14,7 @@
 
 int main() {
   if (DEBUG == 1) std::cout << "DEBUG: Start of main()\n";
+  if (DEBUG == 1) std::cout << "DEBUG: Begin ModuleManagement tests ...\n";
   try {
     // Attempt to load Module Test.so in the modules directory
     ModuleManagement::loadModule("src/modules/Test.so");
@@ -26,6 +27,7 @@ int main() {
     // Something went wrong loading the shared object
     std::cout << e.what() << '\n';
   }
+  if (DEBUG == 1) std::cout << "DEBUG: End ModuleManagement tests ...\n";
   if (DEBUG == 1) std::cout << "DEBUG: End of main()\n";
   return 0;
 }

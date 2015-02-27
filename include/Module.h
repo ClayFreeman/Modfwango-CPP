@@ -22,9 +22,9 @@ class Module {
     Module(const Module&);
     Module& operator= (const Module&);
   protected:
-    void setName(std::string name) {
+    void setName(const std::string& name) {
       // If the name wasn't set already ...
-      if (this->name == std::string{})
+      if (this->name.length() == 0)
         // set the name to the provided value
         this->name = name;
     }
@@ -36,7 +36,7 @@ class Module {
       if (DEBUG == 1) std::cout << "DEBUG: Default ~Module()\n";
     }
     // Each Module needs a getter for its name
-    std::string getName() { return this->name; }
+    const std::string& getName() const { return this->name; }
     // Each Module needs an isInstantiated method
     virtual bool isInstantiated() { return true; }
 };

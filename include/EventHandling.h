@@ -12,29 +12,34 @@
 #define _EVENTHANDLING_H
 
 #include <map>
+#include <memory>
 #include <string>
 #include "Event.h"
 #include "Module.h"
 
 class EventHandling {
   private:
-    static std::map<std::string, Event> events;
+    static std::map<std::string, std::shared_ptr<Event>> events;
     // Prevent this class from being instantiated
     EventHandling() {}
   public:
-    static bool createEvent(std::string name, Module* module,
+    static bool createEvent(const std::string& name,
+      const std::string& parentModule = "",
       void (*callback)(std::string, void*) = nullptr);
-    static bool destroyEvent(std::string name);
-    static bool registerForEvent(std::string name, Module* module,
-      void (*callback)(std::string, void*));
-    static bool registerPreprocessorForEvent(std::string name, Module* module,
-      bool (*callback)(std::string));
-    static bool triggerEvent(std::string name, void* data = nullptr);
-    static bool unregisterEvents(Module* module);
-    static bool unregisterForEvent(std::string name, Module* module);
-    static bool unregisterPreprocessorForEvent(std::string name,
-      Module* module);
-    static bool unregisterModule(Module* module);
+    static bool destroyEvent(const std::string& name);
+    static bool registerForEvent(const std::string& name,
+      const std::string& parentModule, void (*callback)(std::string, void*),
+      const int& priority = 0);
+    static bool registerPreprocessorForEvent(const std::string& name,
+      const std::string& parentModule, bool (*callback)(std::string),
+      const int& priority = 0);
+    static bool triggerEvent(const std::string& name, void* data = nullptr);
+    static bool unregisterEvents(const std::string& parentModule);
+    static bool unregisterForEvent(const std::string& name,
+      const std::string& parentModule);
+    static bool unregisterPreprocessorForEvent(const std::string& name,
+      const std::string& parentModule);
+    static bool unregisterModule(const std::string& parentModule);
 };
 
 #endif

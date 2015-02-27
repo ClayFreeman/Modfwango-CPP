@@ -13,7 +13,9 @@ BASHFLAGS	:= -c
 CPPCHECK	:= cppcheck
 CPPCHECKFLAGS	:=
 CXX		:= g++
-CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -DDEBUG=0
+CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -fPIC -rdynamic -O0 \
+			-DDEBUG=0
+LIBS		:= -ldl
 MODULESDIR	:= ./src/modules
 OUT		 = main
 VALGRIND	:= valgrind
@@ -79,7 +81,7 @@ test:		$(OUT)
 # Links your application.  Depends on all applicable .o files
 $(OUT):		$(DEPENDO)
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(OK)LNK$(RESET)] $@ ...\""
-	@$(CXX) $(CXXFLAGS) -o $@ $^
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 # Builds a ZIP file from your source files and Makefile
 $(OUT).zip:	$(DEPENDCPP) $(DEPENDMODULES) $(DEPENDH) Makefile
@@ -92,6 +94,6 @@ $(OUT).zip:	$(DEPENDCPP) $(DEPENDMODULES) $(DEPENDH) Makefile
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
 	@$(CXX) $(CXXFLAGS) -o $@ -c $^
 
-%.so:		%.cpp
+%.so:		%.cpp $(DEPENDO)
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
-	@$(CXX) $(CXXFLAGS) -o $@ -fPIC -shared $^
+	@$(CXX) $(CXXFLAGS) -o $@ -shared $^

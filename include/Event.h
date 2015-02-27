@@ -51,15 +51,26 @@ class Event {
       return retVal;
     }
     void delRegistration(const std::string& parentModule) {
-      for (auto entry = this->registrations.begin();
-          entry != this->registrations.end(); ++entry)
+      for (auto& entry : this->registrations) {
         // Iterate through each vector in the map of EventRegistrations
-        for (auto subentry = entry->second.begin();
-            subentry != entry->second.end(); ++subentry)
+        for (auto subentry = entry.second.begin();
+            subentry != entry.second.end(); subentry++) {
           // Iterate through each EventRegistration in the vectors
-          if ((*subentry)->getParentModule() == parentModule)
-            // If we get a match, erase the EventRegistration from the vector
-            entry->second.erase(subentry);
+          if ((*subentry)->getParentModule() == parentModule) {
+            // If we get a match, erase the EventRegistration from the vector;
+            // Using subentry-- because when you erase, all future iterators are
+            // invalidated
+            entry.second.erase(subentry--);
+          }
+        }
+      }
+    }
+    const std::string& getName() const { return this->name; }
+    const std::string& getParentModule() const { return this->parentModule; }
+    void trigger(void* data) const {
+      for (auto i : this->registrations)
+        for (auto j : i.second)
+          j->call(this->name, data);
     }
 };
 

@@ -34,17 +34,23 @@ class Test : public Module {
  * @return true if loadable, false otherwise
  */
 bool Test::isInstantiated() {
-  std::cout << "Hello, World!\n";
   if (DEBUG == 1) std::cout << "DEBUG: My name: \"" << this->getName()
     << "\" ...\n";
+  std::cout << "Hello, World!\n";
 
   if (DEBUG == 1) std::cout << "DEBUG: Begin EventHandling tests ...\n";
   EventHandling::createEvent("TestManualDeallocationEvent");
   EventHandling::createEvent("TestScopeDeallocationEvent", this->getName());
+  EventHandling::registerForEvent("TestManualDeallocationEvent",
+    this->getName(), &Test::test_func);
   EventHandling::destroyEvent("TestManualDeallocationEvent");
   EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
     &Test::test_func);
+  EventHandling::triggerEvent("TestScopeDeallocationEvent", (void*)("Hello"));
+  EventHandling::unregisterForEvent("TestScopeDeallocationEvent",
+    this->getName());
   if (DEBUG == 1) std::cout << "DEBUG: End EventHandling tests ...\n";
+
   return true;
 }
 
@@ -57,8 +63,14 @@ bool Test::isInstantiated() {
  * @param[out] data The optional data given with the Event trigger
  */
 void Test::test_func(std::string name, void* data) {
-  if (DEBUG == 1) std::cout << "DEBUG: Event \"" << name
-    << "\" callback received\n";
+  if (DEBUG == 1) {
+    std::cout << "DEBUG: Event \"" << name
+              << "\" callback received with data at address " << data << "\n";
+    if (data != nullptr) {
+      std::cout << "DEBUG: (const char*) value \"" << (const char*)data
+                << "\"\n";
+    }
+  }
 }
 
 /**

@@ -144,6 +144,7 @@ bool EventHandling::registerForEvent(const std::string& name,
 bool EventHandling::registerPreprocessorForEvent(const std::string& name,
     const std::string& parentModule, bool (*callback)(std::string),
     const int& priority) {
+  // TODO:  Implement this method
   return false;
 }
 
@@ -159,7 +160,12 @@ bool EventHandling::registerPreprocessorForEvent(const std::string& name,
  * @return true if the Event was found and triggered, false otherwise
  */
 bool EventHandling::triggerEvent(const std::string& name, void* data) {
-  return false;
+  bool status = false;
+  if (EventHandling::events.count(name) > 0) {
+    EventHandling::events[name]->trigger(data);
+    status = true;
+  }
+  return status;
 }
 
 /**
@@ -173,6 +179,9 @@ bool EventHandling::triggerEvent(const std::string& name, void* data) {
  * @return true if the Events were found and destroyed, false otherwise
  */
 bool EventHandling::unregisterEvents(const std::string& parentModule) {
+  for (auto& event : EventHandling::events)
+    if (event.second->getParentModule() == parentModule)
+      EventHandling::destroyEvent(event.second->getName());
   return false;
 }
 
@@ -189,7 +198,16 @@ bool EventHandling::unregisterEvents(const std::string& parentModule) {
  */
 bool EventHandling::unregisterForEvent(const std::string& name,
     const std::string& parentModule) {
-  return false;
+  bool status = false;
+  if (EventHandling::events.count(name) > 0) {
+    if (DEBUG == 1 && parentModule.length() > 0) std::cout
+      << "DEBUG: Unregistering Module \"" << parentModule << "\" for Event \""
+      << name << "\" ...\n";
+    // Call delRegistration for the given Event
+    EventHandling::events[name]->delRegistration(parentModule);
+    status = true;
+  }
+  return status;
 }
 
 /**
@@ -205,6 +223,7 @@ bool EventHandling::unregisterForEvent(const std::string& name,
  */
 bool EventHandling::unregisterPreprocessorForEvent(const std::string& name,
     const std::string& parentModule) {
+  // TODO:  Implement this method
   return false;
 }
 
@@ -219,5 +238,12 @@ bool EventHandling::unregisterPreprocessorForEvent(const std::string& name,
  *   otherwise
  */
 bool EventHandling::unregisterModule(const std::string& parentModule) {
-  return false;
+  bool status = false;
+  for (auto& event : EventHandling::events) {
+    status = EventHandling::unregisterForEvent(event.second->getName(),
+      parentModule) || status;
+    status = EventHandling::unregisterPreprocessorForEvent(
+      event.second->getName(), parentModule) || status;
+  }
+  return status;
 }

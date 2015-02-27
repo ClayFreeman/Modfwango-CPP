@@ -11,6 +11,8 @@
 #ifndef _EVENTREGISTRATION_H
 #define _EVENTREGISTRATION_H
 
+#include <string>
+
 class EventRegistration {
   private:
     std::string parentModule{};
@@ -24,7 +26,11 @@ class EventRegistration {
       this->parentModule = parentModule;
       this->callback = callback;
     }
-    const std::string& getParentModule() const { return parentModule; }
+    const std::string& getParentModule() const { return this->parentModule; }
+    void call(const std::string& name, void* data) const {
+      if (this->callback != nullptr)
+        this->callback(name, data);
+    }
 };
 
 #endif

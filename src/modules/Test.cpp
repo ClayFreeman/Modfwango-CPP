@@ -46,6 +46,8 @@ bool Test::isInstantiated() {
   EventHandling::destroyEvent("TestManualDeallocationEvent");
   EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
     &Test::test_func);
+  EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
+    &Test::test_func, -1);
   EventHandling::triggerEvent("TestScopeDeallocationEvent", (void*)("Hello"));
   EventHandling::unregisterForEvent("TestScopeDeallocationEvent",
     this->getName());

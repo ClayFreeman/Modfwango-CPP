@@ -29,15 +29,15 @@ class EventHandling {
     static bool registerForEvent(const std::string& name,
       const std::string& parentModule, void (*callback)(std::string, void*),
       const int& priority = 0);
-    // static bool registerPreprocessorForEvent(const std::string& name,
-    //   const std::string& parentModule, bool (*callback)(std::string),
-    //   const int& priority = 0);
+    static bool registerPreprocessorForEvent(const std::string& name,
+      const std::string& parentModule, bool (*callback)(std::string),
+      const int& priority = 0);
     static bool triggerEvent(const std::string& name, void* data = nullptr);
     static bool unregisterEvents(const std::string& parentModule);
     static bool unregisterForEvent(const std::string& name,
       const std::string& parentModule);
-    // static bool unregisterPreprocessorForEvent(const std::string& name,
-    //   const std::string& parentModule);
+    static bool unregisterPreprocessorForEvent(const std::string& name,
+      const std::string& parentModule);
     static bool unregisterModule(const std::string& parentModule);
 };
 

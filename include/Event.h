@@ -15,12 +15,15 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "EventPreprocessor.h"
 #include "EventRegistration.h"
 
 class Event {
   private:
     std::string name{};
     std::string parentModule{};
+    std::map<int, std::vector<std::shared_ptr<EventPreprocessor>>>
+      preprocessors{};
     std::map<int, std::vector<std::shared_ptr<EventRegistration>>>
       registrations{};
     void (*dataCallback)(std::string, void*) = nullptr;
@@ -32,7 +35,10 @@ class Event {
       void (*dataCallback)(std::string, void*) = nullptr);
     void addRegistration(const int& priority,
       const std::shared_ptr<EventRegistration>& registration);
+    void addPreprocessor(const int& priority,
+      const std::shared_ptr<EventPreprocessor>& preprocessor);
     void delRegistration(const std::string& parentModule);
+    void delPreprocessor(const std::string& parentModule);
     const std::string& getName() const { return this->name; }
     const std::string& getParentModule() const { return this->parentModule; }
     void trigger(void* data) const;

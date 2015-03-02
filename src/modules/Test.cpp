@@ -22,6 +22,8 @@ class Test : public Module {
     // Overload the isInstantiated() method
     bool isInstantiated();
     // Create Event callbacks
+    static bool test_preprocessor(std::string name);
+    static bool test_preprocessor1(std::string name);
     static void test_func(std::string name, void* data);
     static void test_func1(std::string name, void* data);
 };
@@ -49,12 +51,41 @@ bool Test::isInstantiated() {
     &Test::test_func);
   EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
     &Test::test_func1, -1);
+  EventHandling::registerPreprocessorForEvent("TestScopeDeallocationEvent",
+    this->getName(), &Test::test_preprocessor);
+  EventHandling::registerPreprocessorForEvent("TestScopeDeallocationEvent",
+    this->getName(), &Test::test_preprocessor1, -1);
   EventHandling::triggerEvent("TestScopeDeallocationEvent", (void*)("Hello"));
   EventHandling::unregisterForEvent("TestScopeDeallocationEvent",
     this->getName());
   if (DEBUG == 1) std::cout << "DEBUG: End EventHandling tests ...\n";
 
   return true;
+}
+
+/**
+ * @brief Test Preprocessor
+ *
+ * A test Event callback preprocessor
+ *
+ * @param      name The name of the originating Event
+ */
+bool Test::test_preprocessor(std::string name) {
+  if (DEBUG == 1) std::cout << "DEBUG: Event preprocessor for \""
+    << name << "\"\n";
+  return true;
+}
+
+/**
+ * @brief Test Preprocessor
+ *
+ * A test Event callback preprocessor
+ *
+ * @param      name The name of the originating Event
+ */
+bool Test::test_preprocessor1(std::string name) {
+  if (DEBUG == 1) std::cout << "DEBUG: test_preprocessor1() called\n";
+  return Test::test_preprocessor(name);
 }
 
 /**

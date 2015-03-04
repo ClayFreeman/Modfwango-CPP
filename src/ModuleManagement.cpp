@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "../include/Logger.h"
 #include "../include/Module.h"
 #include "../include/ModuleInstance.h"
 #include "../include/ModuleManagement.h"
@@ -55,8 +56,6 @@ std::string ModuleManagement::getBasename(const std::string& name) {
   std::string ret = base;
   delete[] n;
 
-  if (DEBUG == 1) std::cout << "DEBUG: Basename computed: \"" << ret << "\"\n";
-
   return ret;
 }
 
@@ -77,7 +76,6 @@ std::shared_ptr<Module> ModuleManagement::getModuleByName(
   if (ModuleManagement::modules.count(name) > 0) {
     return ModuleManagement::modules[name]->module;
   }
-  if (DEBUG == 1) std::cout << "DEBUG: getModuleByName(): No match\n";
   return nullptr;
 }
 
@@ -97,7 +95,7 @@ std::shared_ptr<Module> ModuleManagement::getModuleByName(
  */
 bool ModuleManagement::loadModule(const std::string& name) {
   bool status = false;
-  if (DEBUG == 1) std::cout << "DEBUG: Loading Module \"" << name << "\" ...\n";
+  Logger::debug("Attempting to load module \"" + name + "\" ...");
   std::string e;
   if (!ModuleManagement::getModuleByName(ModuleManagement::getBasename(name))) {
     // Attempt to load the requested shared object
@@ -126,41 +124,69 @@ bool ModuleManagement::loadModule(const std::string& name) {
           if (module->isInstantiated() == true) {
             // Module loaded successfully
             status = true;
+            Logger::info("Loaded Module \"" + name
+              + "\" ...");
           }
           else {
             // Unload the module
             ModuleManagement::unloadModule(ModuleManagement::getBasename(name));
+
+            Logger::debug("Unable to load module \""
+              + ModuleManagement::getBasename(name) + "\"");
+
+            e += "Module refused to load during \"";
+            e += ModuleManagement::getBasename(name);
+            e += "::isInstantiated()\"";
+            Logger::debug(e);
+            throw std::logic_error(e);
           }
         }
         else {
           if (module != nullptr) delete module;
           dlclose(obj);
 
+          Logger::debug("Unable to load module \""
+            + ModuleManagement::getBasename(name) + "\"");
+
           e += "Internal logic error in module \"";
           e += ModuleManagement::getBasename(name);
           e += "\" during _load()";
+          Logger::debug(e);
           throw std::logic_error(e);
         }
       }
       else {
         dlclose(obj);
 
+        Logger::debug("Unable to load module \""
+          + ModuleManagement::getBasename(name) + "\"");
+
         // Handle errors fetching a pointer
         e += err;
+        Logger::debug(e);
         throw std::runtime_error(e);
       }
     }
     else {
       // Handle miscellaneous errors
       const char* err = dlerror();
+
+      Logger::debug("Unable to load module \""
+        + ModuleManagement::getBasename(name) + "\"");
+
       e += err;
+      Logger::debug(e);
       throw std::runtime_error(e);
     }
   }
   else {
+    Logger::debug("Unable to load module \""
+      + ModuleManagement::getBasename(name) + "\"");
+
     e += "Module with name \"";
     e += ModuleManagement::getBasename(name);
     e += "\" is already loaded";
+    Logger::debug(e);
     throw std::runtime_error(e);
   }
   return status;
@@ -176,8 +202,6 @@ bool ModuleManagement::loadModule(const std::string& name) {
  * @return true on success, false otherwise
  */
 bool ModuleManagement::reloadModule(const std::string& name) {
-  if (DEBUG == 1) std::cout << "DEBUG: Reloading Module \"" << name
-    << "\" ...\n";
   // Unload the module, then load it again
   return ModuleManagement::unloadModule(ModuleManagement::getBasename(name)) &&
     ModuleManagement::loadModule(name);
@@ -193,7 +217,7 @@ bool ModuleManagement::reloadModule(const std::string& name) {
  * @return true on success, false otherwise
  */
 bool ModuleManagement::unloadModule(const std::string& name) {
-  if (DEBUG == 1) std::cout << "DEBUG: Unloading Module \"" << name
-    << "\" ...\n";
+  if (ModuleManagement::modules.count(name) > 0)
+    Logger::info("Unloaded Module \"" + name + "\" ...");
   return ModuleManagement::modules.erase(name) > 0;
 }

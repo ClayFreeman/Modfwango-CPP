@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <string>
+#include "../include/Logger.h"
 #include "../include/Module.h"
 
 /**
@@ -24,22 +25,4 @@ void Module::setName(const std::string& name) {
   if (this->name.length() == 0)
     // set the name to the provided value
     this->name = name;
-}
-
-/**
- * @brief Constructor
- *
- * The default constructor for the Module base class
- */
-Module::Module() {
-  if (DEBUG == 1) std::cout << "DEBUG: Default Module()\n";
-}
-
-/**
- * @brief Destructor
- *
- * The default destructor for the Module base class
- */
-Module::~Module() {
-  if (DEBUG == 1) std::cout << "DEBUG: Default ~Module()\n";
 }

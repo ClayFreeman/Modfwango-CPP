@@ -16,6 +16,7 @@
 #include "../include/EventHandling.h"
 #include "../include/EventPreprocessor.h"
 #include "../include/EventRegistration.h"
+#include "../include/Logger.h"
 #include "../include/ModuleManagement.h"
 
 // Initialize the events map
@@ -43,8 +44,7 @@ bool EventHandling::createEvent(const std::string& name,
   if (name.length() > 0 && EventHandling::events.count(name) == 0 &&
       (parentModule.length() == 0 ||
         ModuleManagement::getModuleByName(parentModule).get() != nullptr)) {
-    if (DEBUG == 1) std::cout << "DEBUG: Creating Event \"" << name <<
-      "\" ...\n";
+    Logger::debug("Creating Event \"" + name + "\" ...");
     // Create and insert the Event into the events map
     EventHandling::events[name] = std::shared_ptr<Event>{
       new Event{name, parentModule, callback}
@@ -52,8 +52,8 @@ bool EventHandling::createEvent(const std::string& name,
     // Return a true status upon creation
     status = true;
   }
-  else if (DEBUG == 1) std::cout << "DEBUG: Problem creating Event \"" << name
-    << "\"\n";
+  else Logger::debug("Problem creating Event \"" + name
+    + "\"");
   return status;
 }
 
@@ -68,8 +68,8 @@ bool EventHandling::createEvent(const std::string& name,
  * @return true if the Event was found and destroyed, false otherwise
  */
 bool EventHandling::destroyEvent(const std::string& name) {
-  if (DEBUG == 1) std::cout << "DEBUG: Destroying Event \"" << name <<
-    "\" (manually) ...\n";
+  Logger::debug("Destroying Event \"" + name
+    + "\" ...");
   return EventHandling::events.erase(name) > 0;
 }
 
@@ -105,6 +105,8 @@ bool EventHandling::registerForEvent(const std::string& name,
         callback
       }}
     );
+    if (parentModule.length() > 0) Logger::debug("Module \"" + parentModule
+      + "\" registered [R] for Event \"" + name + "\"");
     status = true;
   }
   return status;
@@ -147,6 +149,8 @@ bool EventHandling::registerPreprocessorForEvent(const std::string& name,
         callback
       }}
     );
+    if (parentModule.length() > 0) Logger::debug("Module \"" + parentModule
+      + "\" registered [P] for Event \"" + name + "\"");
     status = true;
   }
   return status;
@@ -166,6 +170,7 @@ bool EventHandling::registerPreprocessorForEvent(const std::string& name,
 bool EventHandling::triggerEvent(const std::string& name, void* data) {
   bool status = false;
   if (EventHandling::events.count(name) > 0) {
+    Logger::debug("Triggering Event \"" + name + "\" ...");
     EventHandling::events[name]->trigger(data);
     status = true;
   }
@@ -183,8 +188,8 @@ bool EventHandling::triggerEvent(const std::string& name, void* data) {
  * @return true if the Events were found and destroyed, false otherwise
  */
 bool EventHandling::unregisterEvents(const std::string& parentModule) {
-  if (DEBUG == 1) std::cout << "DEBUG: Deleting Event(s) owned by Module \""
-    << parentModule << "\"\n";
+  Logger::debug("Deleting Event(s) owned by Module \""
+    + parentModule + "\"");
   bool status = false;
   for (auto& event : EventHandling::events)
     if (event.second->getParentModule() == parentModule)
@@ -209,6 +214,8 @@ bool EventHandling::unregisterForEvent(const std::string& name,
   if (EventHandling::events.count(name) > 0) {
     // Call delRegistration for the given Event
     EventHandling::events[name]->delRegistration(parentModule);
+    if (parentModule.length() > 0) Logger::debug("Module \"" + parentModule
+      + "\" unregistered [R] for Event \"" + name + "\"");
     status = true;
   }
   return status;
@@ -231,6 +238,8 @@ bool EventHandling::unregisterPreprocessorForEvent(const std::string& name,
   if (EventHandling::events.count(name) > 0) {
     // Call delPreprocessor for the given Event
     EventHandling::events[name]->delPreprocessor(parentModule);
+    if (parentModule.length() > 0) Logger::debug("Module \"" + parentModule
+      + "\" unregistered [P] for Event \"" + name + "\"");
     status = true;
   }
   return status;
@@ -253,6 +262,8 @@ bool EventHandling::unregisterModule(const std::string& parentModule) {
       parentModule) || status;
     status = EventHandling::unregisterPreprocessorForEvent(
       event.second->getName(), parentModule) || status;
+    if (parentModule.length() > 0) Logger::debug("Module \"" + parentModule
+      + "\" unregistered for all Events");
   }
   return status;
 }

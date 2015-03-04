@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include "../include/EventRegistration.h"
+#include "../include/Logger.h"
 
 /**
  * @brief Constructor
@@ -35,13 +36,6 @@ EventRegistration::EventRegistration(std::string parentModule,
  * @param data A pointer to some data
  */
 void EventRegistration::call(const std::string& name, void* data) const {
-  if (DEBUG == 1) {
-    std::cout << "DEBUG: Calling callback function for Event \"" << name
-              << "\"";
-    if (this->parentModule.length() > 0)
-      std::cout << " for Module \"" << this->parentModule << "\"";
-    std::cout << " ...\n";
-  }
   if (this->callback != nullptr)
     this->callback(name, data);
 }

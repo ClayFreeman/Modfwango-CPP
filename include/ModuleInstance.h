@@ -14,11 +14,12 @@
 #include <dlfcn.h>
 #include <iostream>
 #include <memory>
+#include "Logger.h"
 #include "Module.h"
 
 template<class T>
 void delete_dlobject(void* p) {
-  if (DEBUG == 1) std::cout << "DEBUG: dlclose(p)\n";
+  Logger::debug("dlclose(p)");
   dlclose(static_cast<T*>(p));
 }
 

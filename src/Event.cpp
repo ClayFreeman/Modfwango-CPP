@@ -8,6 +8,7 @@
  * @date       February 27, 2015
  */
 
+#include <cctype>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -15,6 +16,7 @@
 #include <vector>
 #include "../include/Event.h"
 #include "../include/EventRegistration.h"
+#include "../include/Logger.h"
 
 /**
  * @brief Constructor
@@ -45,13 +47,6 @@ void Event::addRegistration(const int& priority,
     const std::shared_ptr<EventRegistration>& registration) {
   // Add this EventRegistration for the provided priority to the end of
   // the vector
-  if (DEBUG == 1) {
-    std::cout << "DEBUG: Adding EventRegistration for \"" << this->name
-              << "\" with priority " << priority;
-    if (registration->getParentModule().length() > 0)
-      std::cout << " for Module \"" << registration->getParentModule() << "\"";
-    std::cout << " ...\n";
-  }
   this->registrations[priority].push_back(registration);
 }
 
@@ -67,13 +62,6 @@ void Event::addPreprocessor(const int& priority,
     const std::shared_ptr<EventPreprocessor>& preprocessor) {
   // Add this EventPreprocessor for the provided priority to the end of
   // the vector
-  if (DEBUG == 1) {
-    std::cout << "DEBUG: Adding EventRegistration [p] for \"" << this->name
-              << "\" with priority " << priority;
-    if (preprocessor->getParentModule().length() > 0)
-      std::cout << " for Module \"" << preprocessor->getParentModule() << "\"";
-    std::cout << " ...\n";
-  }
   this->preprocessors[priority].push_back(preprocessor);
 }
 
@@ -85,8 +73,6 @@ void Event::addPreprocessor(const int& priority,
  * @param parentModule The name of the parent Module
  */
 void Event::delRegistration(const std::string& parentModule) {
-  if (DEBUG == 1) std::cout << "DEBUG: Deleting EventRegistration(s) for \""
-    << this->name << "\" for Module \"" << parentModule << "\" ...\n";
   for (auto& entry : this->registrations) {
     // Iterate through each vector in the map of EventRegistrations
     for (auto subentry = entry.second.begin();
@@ -110,8 +96,6 @@ void Event::delRegistration(const std::string& parentModule) {
  * @param parentModule The name of the parent Module
  */
 void Event::delPreprocessor(const std::string& parentModule) {
-  if (DEBUG == 1) std::cout << "DEBUG: Deleting EventRegistration(s) [p] for \""
-    << this->name << "\" for Module \"" << parentModule << "\" ...\n";
   for (auto& entry : this->preprocessors) {
     // Iterate through each vector in the map of EventRegistrations
     for (auto subentry = entry.second.begin();

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include "../include/EventPreprocessor.h"
+#include "../include/Logger.h"
 
 /**
  * @brief Constructor
@@ -37,12 +38,5 @@ EventPreprocessor::EventPreprocessor(std::string parentModule,
  * @return the bool value returned by the callee
  */
 bool EventPreprocessor::call(const std::string& name) const {
-  if (DEBUG == 1) {
-    std::cout << "DEBUG: Calling callback function for Event \"" << name
-              << "\"";
-    if (this->parentModule.length() > 0)
-      std::cout << " for Module \"" << this->parentModule << "\"";
-    std::cout << " ...\n";
-  }
   return (this->callback != nullptr ? this->callback(name) : false);
 }

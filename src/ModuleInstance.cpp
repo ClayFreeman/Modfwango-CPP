@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <memory>
+#include "../include/Logger.h"
 #include "../include/Module.h"
 #include "../include/ModuleInstance.h"
 
@@ -33,9 +34,6 @@ ModuleInstance::ModuleInstance(const std::shared_ptr<Module>& m,
  * Cleans up a Module and its shared object
  */
 ModuleInstance::~ModuleInstance() {
-  if (DEBUG == 1) std::cout << "DEBUG: Default ~ModuleInstance() ...\n";
-  if (DEBUG == 1) std::cout << "DEBUG: Deleting Module ...\n";
   module.reset();
-  if (DEBUG == 1) std::cout << "DEBUG: Deleting object ...\n";
   object.reset();
 }

@@ -9,8 +9,10 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "../../include/EventHandling.h"
+#include "../../include/Logger.h"
 #include "../../include/Module.h"
 
 class Test : public Module {
@@ -18,14 +20,12 @@ class Test : public Module {
     // Initialize the name property
     Test() { this->setName("Test"); }
     // Demonstrate overriding the destructor
-    ~Test() { if (DEBUG == 1) std::cout << "DEBUG: ~Test()\n"; }
+    ~Test() {}
     // Overload the isInstantiated() method
     bool isInstantiated();
     // Create Event callbacks
     static bool test_preprocessor(std::string name);
-    static bool test_preprocessor1(std::string name);
     static void test_func(std::string name, void* data);
-    static void test_func1(std::string name, void* data);
 };
 
 /**
@@ -37,29 +37,15 @@ class Test : public Module {
  * @return true if loadable, false otherwise
  */
 bool Test::isInstantiated() {
-  if (DEBUG == 1) std::cout << "DEBUG: My name: \"" << this->getName()
-    << "\" ...\n";
-  std::cout << "Hello, World!\n";
-
-  if (DEBUG == 1) std::cout << "DEBUG: Begin EventHandling tests ...\n";
-  EventHandling::createEvent("TestManualDeallocationEvent");
-  EventHandling::createEvent("TestScopeDeallocationEvent", this->getName());
-  EventHandling::registerForEvent("TestManualDeallocationEvent",
-    this->getName(), &Test::test_func);
-  EventHandling::destroyEvent("TestManualDeallocationEvent");
-  EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
+  Logger::stack(__FUNCTION__);
+  Logger::debug("My name is: " + this->getName());
+  EventHandling::createEvent("testEvent", this->getName());
+  EventHandling::registerPreprocessorForEvent("testEvent", this->getName(),
+    &Test::test_preprocessor);
+  EventHandling::registerForEvent("testEvent", this->getName(),
     &Test::test_func);
-  EventHandling::registerForEvent("TestScopeDeallocationEvent", this->getName(),
-    &Test::test_func1, -1);
-  EventHandling::registerPreprocessorForEvent("TestScopeDeallocationEvent",
-    this->getName(), &Test::test_preprocessor);
-  EventHandling::registerPreprocessorForEvent("TestScopeDeallocationEvent",
-    this->getName(), &Test::test_preprocessor1, -1);
-  EventHandling::triggerEvent("TestScopeDeallocationEvent", (void*)("Hello"));
-  EventHandling::unregisterForEvent("TestScopeDeallocationEvent",
-    this->getName());
-  if (DEBUG == 1) std::cout << "DEBUG: End EventHandling tests ...\n";
-
+  EventHandling::triggerEvent("testEvent", (void*)"Hello");
+  Logger::stack(__FUNCTION__, true);
   return true;
 }
 
@@ -71,21 +57,10 @@ bool Test::isInstantiated() {
  * @param      name The name of the originating Event
  */
 bool Test::test_preprocessor(std::string name) {
-  if (DEBUG == 1) std::cout << "DEBUG: Event preprocessor for \""
-    << name << "\"\n";
+  Logger::stack(__FUNCTION__);
+  Logger::debug("Preprocessing Event \"" + name + "\" ...");
+  Logger::stack(__FUNCTION__, true);
   return true;
-}
-
-/**
- * @brief Test Preprocessor
- *
- * A test Event callback preprocessor
- *
- * @param      name The name of the originating Event
- */
-bool Test::test_preprocessor1(std::string name) {
-  if (DEBUG == 1) std::cout << "DEBUG: test_preprocessor1() called\n";
-  return Test::test_preprocessor(name);
 }
 
 /**
@@ -97,26 +72,13 @@ bool Test::test_preprocessor1(std::string name) {
  * @param[out] data The optional data given with the Event trigger
  */
 void Test::test_func(std::string name, void* data) {
-  if (DEBUG == 1) {
-    std::cout << "DEBUG: Event \"" << name
-              << "\" callback received with data at address " << data << "\n";
-    if (data != nullptr) {
-      std::cout << "DEBUG: (const char*)\"" << (const char*)data << "\"\n";
-    }
-  }
-}
-
-/**
- * @brief Test Function 1
- *
- * Calls test_func(...)
- *
- * @param      name The name of the originating Event
- * @param[out] data The optional data given with the Event trigger
- */
-void Test::test_func1(std::string name, void* data) {
-  if (DEBUG == 1) std::cout << "DEBUG: test_func1() called\n";
-  Test::test_func(name, data);
+  Logger::stack(__FUNCTION__);
+  std::ostringstream oss;
+  oss << data;
+  Logger::devel("data: " + oss.str());
+  Logger::debug("Event \"" + name + "\" callback: (const char*)\""
+    + std::string{(const char*)data} + "\"");
+  Logger::stack(__FUNCTION__, true);
 }
 
 /**

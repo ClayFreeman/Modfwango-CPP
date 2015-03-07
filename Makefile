@@ -49,6 +49,22 @@ CLEAN		:= $(subst ./,,$(call RWILDCARD,./,*.dSYM)) $(DEPENDO) \
   ############################### UTIL TARGETS ###############################
 
 # Builds and links the application
+target_default =
+ifeq ($(words $(MAKECMDGOALS)),0)
+target_default = yes
+endif
+ifeq ($(words $(MAKECMDGOALS)),1)
+target_default = yes
+endif
+
+ifndef target_default
+.NOTPARALLEL:
+$(MAKECMDGOALS):%:
+	@$(MAKE) --no-print-directory $@
+	@exit 0
+endif
+
+ifdef target_default
 all:		$(OUT) $(DEPENDSO)
 # Builds with macro DEBUG set to 1 instead of 0
 debug:		.debug all
@@ -57,16 +73,8 @@ debug:		.debug all
 	$(eval CXXFLAGS := $(CXXFLAGS) -g -DDEBUG=1)
 # Builds a ZIP file of your CPP/H/Makefile files
 zip:		$(OUT).zip
-# Remove any compiled or ZIP files if they exist
-clean:
-	@$(foreach item,$(CLEAN), $(BASH) $(BASHFLAGS) \
-		"if [ -a $(item) ]; then \
-			echo -e \"[$(ERROR)DEL$(RESET)] $(item)\"; \
-			rm -rf $(item); \
-		fi;"; \
-	)
 # Run cppcheck and valgrind to point out any potential mistakes in your code
-test:		$(OUT)
+test:		all
 	@$(foreach item,$(DEPENDCPP), \
 		$(BASH) $(BASHFLAGS) "printf \"[$(WARN)CHK$(RESET)] \""; \
 		$(CPPCHECK) $(CPPCHECKFLAGS) $(item); \
@@ -75,6 +83,15 @@ test:		$(OUT)
 		"echo -e \"[$(WARN)CHK$(RESET)] Press enter to run memcheck.\""
 	@read cont
 	@$(VALGRIND) $(VALGRINDFLAGS) ./$(OUT)
+# Remove any compiled or ZIP files if they exist
+clean:
+	@$(foreach item,$(CLEAN), $(BASH) $(BASHFLAGS) \
+		"if [ -a $(item) ]; then \
+			echo -e \"[$(ERROR)DEL$(RESET)] $(item)\"; \
+			rm -rf $(item); \
+		fi;"; \
+	)
+endif
 
   ############################## BUILD TARGETS ###############################
 

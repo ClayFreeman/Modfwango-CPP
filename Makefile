@@ -16,7 +16,8 @@ CXX		:= g++
 CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -fPIC -rdynamic \
 			-DDEBUG=0
 VALGRIND	:= valgrind
-VALGRINDFLAGS	:= -v --tool=memcheck --leak-check=full --dsymutil=yes
+VALGRINDFLAGS	:= --tool=memcheck --leak-check=full --dsymutil=yes \
+			--show-leak-kinds=all
 ZIP		:= zip
 ZIPFLAGS	:= -q
 
@@ -29,13 +30,13 @@ WARN		:= \x1b[33;01m
 ################################### INTERNAL ###################################
 
 # Don't touch these variables
-LIBS		:= $(shell touch .Makefile-libs && cat .Makefile-libs)
-MODSDIR		:= $(shell touch .Makefile-modsdir && cat .Makefile-modsdir)
+LIBS		= $(shell touch .Makefile-libs && cat .Makefile-libs)
+MODSDIR		= $(shell touch .Makefile-modsdir && cat .Makefile-modsdir)
 
 ifneq ($(words $(shell touch .Makefile-out && cat .Makefile-out)),0)
-OUT		 := $(shell cat .Makefile-out)
+OUT		= $(shell cat .Makefile-out)
 else
-OUT		 = $(DIR)
+OUT		= $(DIR)
 endif
 
 RWILDCARD	 = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard \

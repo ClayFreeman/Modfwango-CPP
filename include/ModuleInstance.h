@@ -35,7 +35,8 @@ class ModuleInstance {
     std::shared_ptr<void> object;
     // Define default constructor to accept module and object
     ModuleInstance(const std::shared_ptr<Module>& m,
-      const std::shared_ptr<void>& o);
+      const std::shared_ptr<void>& o):
+      module{m}, object{o} {}
     // Define destructor to correctly destroy elements
     ~ModuleInstance();
 };

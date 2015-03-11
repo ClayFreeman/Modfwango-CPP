@@ -20,10 +20,10 @@ int main(int argc, char* argv[]) {
     // Attempt to load Module Test.so in the modules directory
     ModuleManagement::loadModule("src/modules/Test.so");
   }
-  catch (std::logic_error e) {
+  catch (const std::logic_error& e) {
     // Something went wrong with the Module; tell the developer
   }
-  catch (std::runtime_error e) {
+  catch (const std::runtime_error& e) {
     // Something went wrong loading the shared object
   }
   return 0;

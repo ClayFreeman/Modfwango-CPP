@@ -11,13 +11,10 @@
 BASH		:= bash
 BASHFLAGS	:= -c
 CPPCHECK	:= cppcheck
-CPPCHECKFLAGS	:=
+CPPCHECKFLAGS	:= --enable=warning,style,performance,portability --std=posix
 CXX		:= g++
 CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -fPIC -rdynamic \
 			-DDEBUG=0
-LIBS		:= -ldl
-MODULESDIR	:= ./src/modules
-OUT		 = main
 VALGRIND	:= valgrind
 VALGRINDFLAGS	:= -v --tool=memcheck --leak-check=full --dsymutil=yes
 ZIP		:= zip
@@ -32,17 +29,26 @@ WARN		:= \x1b[33;01m
 ################################### INTERNAL ###################################
 
 # Don't touch these variables
+LIBS		:= $(shell touch .Makefile-libs && cat .Makefile-libs)
+MODSDIR		:= $(shell touch .Makefile-modsdir && cat .Makefile-modsdir)
+
+ifneq ($(words $(shell touch .Makefile-out && cat .Makefile-out)),0)
+OUT		 := $(shell cat .Makefile-out)
+else
+OUT		 = $(DIR)
+endif
+
 RWILDCARD	 = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard \
 			$(addsuffix *, $1)),$(call RWILDCARD,$d/,$2))
 DEPENDCPP	:= $(subst ./,,$(call RWILDCARD,./,*.cpp))
-DEPENDMODULES	:= $(subst ./,,$(call RWILDCARD,$(MODULESDIR),*.cpp))
+DEPENDMODULES	:= $(subst ./,,$(call RWILDCARD,$(MODSDIR),*.cpp))
 $(foreach item,$(DEPENDMODULES), \
 	$(eval DEPENDCPP := $(filter-out $(item),$(DEPENDCPP))) \
 )
 DEPENDH		:= $(subst ./,,$(call RWILDCARD,./,*.h))
 DEPENDO		:= $(patsubst %.cpp,%.o, $(DEPENDCPP))
 DEPENDSO	:= $(patsubst %.cpp,%.so, $(DEPENDMODULES))
-OOP		:= $(shell basename "`pwd`")
+DIR		:= $(shell basename "`pwd`")
 CLEAN		:= $(subst ./,,$(call RWILDCARD,./,*.dSYM)) $(DEPENDO) \
 			$(DEPENDSO) $(OUT) $(OUT).zip
 
@@ -50,29 +56,38 @@ CLEAN		:= $(subst ./,,$(call RWILDCARD,./,*.dSYM)) $(DEPENDO) \
 
 # Builds and links the application
 target_default =
+
 ifeq ($(words $(MAKECMDGOALS)),0)
 target_default = yes
 endif
+
 ifeq ($(words $(MAKECMDGOALS)),1)
 target_default = yes
 endif
 
 ifndef target_default
+
 .NOTPARALLEL:
+
 $(MAKECMDGOALS):%:
 	@$(MAKE) --no-print-directory $@
 	@exit 0
+
 endif
 
 ifdef target_default
+
 all:		$(OUT) $(DEPENDSO)
+
 # Builds with macro DEBUG set to 1 instead of 0
 debug:		.debug all
 .debug:
 	$(eval CXXFLAGS := $(filter-out -DDEBUG=%,$(CXXFLAGS)))
-	$(eval CXXFLAGS := $(CXXFLAGS) -g -DDEBUG=1)
+	$(eval CXXFLAGS := $(CXXFLAGS) -DDEBUG=1)
+
 # Builds a ZIP file of your CPP/H/Makefile files
 zip:		$(OUT).zip
+
 # Run cppcheck and valgrind to point out any potential mistakes in your code
 test:		all
 	@$(foreach item,$(DEPENDCPP), \
@@ -83,6 +98,7 @@ test:		all
 		"echo -e \"[$(WARN)CHK$(RESET)] Press enter to run memcheck.\""
 	@read cont
 	@$(VALGRIND) $(VALGRINDFLAGS) ./$(OUT)
+
 # Remove any compiled or ZIP files if they exist
 clean:
 	@$(foreach item,$(CLEAN), $(BASH) $(BASHFLAGS) \
@@ -91,6 +107,7 @@ clean:
 			rm -rf $(item); \
 		fi;"; \
 	)
+
 endif
 
   ############################## BUILD TARGETS ###############################
@@ -107,10 +124,10 @@ $(OUT).zip:	$(DEPENDCPP) $(DEPENDMODULES) $(DEPENDH) Makefile
 	@$(ZIP) $(ZIPFLAGS) -r $@ $^
 
 # Builds any object file from a CPP file
-%.o:		%.cpp
+%.o:		%.cpp | $(DEPENDH)
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
 	@$(CXX) $(CXXFLAGS) -o $@ -c $^
 
-%.so:		%.cpp
+%.so:		%.cpp | $(DEPENDH)
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
 	@$(CXX) $(CXXFLAGS) -o $@ -shared $^

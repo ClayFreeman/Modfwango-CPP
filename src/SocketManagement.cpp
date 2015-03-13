@@ -89,7 +89,6 @@ void SocketManagement::stall() {
     if (i.second->getSock() > max)
       max = i.second->getSock();
   }
-
   for (auto i : ConnectionManagement::getConnections()) {
     FD_SET(i->getSock(), &rfds);
     if (i->getSock() > max)

@@ -31,13 +31,13 @@ class Connection {
     Connection(const std::string& addr, int portno, int sock):
       host{addr}, port{portno}, sockfd{sock} {}
     ~Connection();
-    std::string getData() const;
-    std::string getHost() const { return this->host; }
-    int         getPort() const { return this->port; }
-    int         getSock() const { return this->sockfd; }
-    bool        isValid() const { return fcntl(this->sockfd, F_GETFD) != -1 ||
-                              errno != EBADF; };
-    void        send(const std::string& data) const;
+    std::string        getData() const;
+    const std::string& getHost() const { return this->host; }
+    int                getPort() const { return this->port; }
+    int                getSock() const { return this->sockfd; }
+    bool               isValid() const
+      { return fcntl(this->sockfd, F_GETFD) != -1 || errno != EBADF; };
+    void               send(const std::string& data) const;
 };
 
 #endif

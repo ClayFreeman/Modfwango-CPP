@@ -48,9 +48,8 @@ bool Test::isInstantiated() {
     SocketManagement::acceptConnections();
     ConnectionManagement::pruneConnections();
     for (auto i : ConnectionManagement::getConnections()) {
-      std::string data;
       try {
-        data = i->getData();
+        const std::string& data = i->getData();
         if (data == "DIE")
           running = false;
       }

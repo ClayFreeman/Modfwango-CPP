@@ -31,8 +31,8 @@ Socket::Socket(const std::string& addr, int portno): host{addr}, port{portno} {
 
   // Setup the socket
   this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  // // Set nonblocking mode
-  // fcntl(this->sockfd, F_SETFL, O_NONBLOCK);
+  // Set nonblocking mode (to be safe, not needed)
+  fcntl(this->sockfd, F_SETFL, O_NONBLOCK);
   // Allow reusing the socket
   int yes = 1;
   setsockopt(this->sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
@@ -87,11 +87,11 @@ std::shared_ptr<Connection> Socket::acceptConnection() const {
       ":" + std::to_string(this->port) + " - Invalid socket"};
   }
 
-  // // Set nonblocking mode
-  // fcntl(this->sockfd, F_SETFL, O_NONBLOCK);
+  // Set nonblocking mode (to be safe, not needed)
+  fcntl(this->sockfd, F_SETFL, O_NONBLOCK);
 
-  Logger::debug("Accepted client on " + this->host + ":" +
-    std::to_string(this->port));
+  Logger::debug("Accepted client " + std::string{inet_ntoa(cli_addr.sin_addr)} +
+    " on " + this->host + ":" + std::to_string(this->port));
   return std::shared_ptr<Connection>{
     new Connection{inet_ntoa(cli_addr.sin_addr), this->port, cli_fd}
   };

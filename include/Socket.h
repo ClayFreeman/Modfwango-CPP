@@ -29,11 +29,11 @@ class Socket {
     Socket(const std::string& addr, int portno);
     ~Socket();
     std::shared_ptr<Connection> acceptConnection() const;
-    std::string getHost() const { return this->host; }
-    int         getPort() const { return this->port; }
-    int         getSock() const { return this->sockfd; }
-    bool        isValid() const { return fcntl(this->sockfd, F_GETFD) != -1 ||
-                              errno != EBADF; };
+    const std::string& getHost() const { return this->host; }
+    int                getPort() const { return this->port; }
+    int                getSock() const { return this->sockfd; }
+    bool               isValid() const
+      { return fcntl(this->sockfd, F_GETFD) != -1 || errno != EBADF; };
 };
 
 #endif

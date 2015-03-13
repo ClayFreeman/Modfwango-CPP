@@ -8,7 +8,6 @@
  * @date       February 19, 2015
  */
 
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>

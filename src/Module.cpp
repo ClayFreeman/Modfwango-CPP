@@ -8,7 +8,6 @@
  * @date       February 27, 2015
  */
 
-#include <iostream>
 #include <string>
 #include "../include/Logger.h"
 #include "../include/Module.h"

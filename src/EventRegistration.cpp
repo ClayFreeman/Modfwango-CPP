@@ -8,7 +8,6 @@
  * @date       February 27, 2015
  */
 
-#include <iostream>
 #include <string>
 #include "../include/EventRegistration.h"
 #include "../include/Logger.h"

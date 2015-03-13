@@ -12,7 +12,6 @@
 #define _MODULEINSTANCE_H
 
 #include <dlfcn.h>
-#include <iostream>
 #include <memory>
 #include "Logger.h"
 #include "Module.h"

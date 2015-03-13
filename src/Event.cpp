@@ -8,8 +8,7 @@
  * @date       February 27, 2015
  */
 
-#include <cctype>
-#include <iostream>
+#include <ctype.h>
 #include <map>
 #include <memory>
 #include <string>

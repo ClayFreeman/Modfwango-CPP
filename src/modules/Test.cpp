@@ -8,12 +8,16 @@
  * @date       January 23, 2015
  */
 
-#include <iostream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
+#include "../../include/Connection.h"
+#include "../../include/ConnectionManagement.h"
 #include "../../include/EventHandling.h"
 #include "../../include/Logger.h"
 #include "../../include/Module.h"
+#include "../../include/Socket.h"
+#include "../../include/SocketManagement.h"
 
 class Test : public Module {
   public:
@@ -23,9 +27,6 @@ class Test : public Module {
     ~Test() {}
     // Overload the isInstantiated() method
     bool isInstantiated();
-    // Create Event callbacks
-    static bool test_preprocessor(std::string name);
-    static void test_func(std::string name, void* data);
 };
 
 /**
@@ -38,47 +39,28 @@ class Test : public Module {
  */
 bool Test::isInstantiated() {
   Logger::stack(__FUNCTION__);
-  Logger::debug("My name is: " + this->getName());
-  EventHandling::createEvent("testEvent", this->getName());
-  EventHandling::registerPreprocessorForEvent("testEvent", this->getName(),
-    &Test::test_preprocessor);
-  EventHandling::registerForEvent("testEvent", this->getName(),
-    &Test::test_func);
-  EventHandling::triggerEvent("testEvent", (void*)"Hello");
+
+  Logger::debug("Begin Socket test");
+  bool running = true;
+  SocketManagement::newSocket("0.0.0.0", 1337);
+  while (running == true) {
+    SocketManagement::stall();
+    SocketManagement::acceptConnections();
+    ConnectionManagement::pruneConnections();
+    for (auto i : ConnectionManagement::getConnections()) {
+      std::string data;
+      try {
+        data = i->getData();
+        if (data == "DIE")
+          running = false;
+      }
+      catch (const std::runtime_error&) {}
+    }
+  }
+  Logger::debug("End Socket test");
+
   Logger::stack(__FUNCTION__, true);
   return true;
-}
-
-/**
- * @brief Test Preprocessor
- *
- * A test Event callback preprocessor
- *
- * @param      name The name of the originating Event
- */
-bool Test::test_preprocessor(std::string name) {
-  Logger::stack(__FUNCTION__);
-  Logger::debug("Preprocessing Event \"" + name + "\" ...");
-  Logger::stack(__FUNCTION__, true);
-  return true;
-}
-
-/**
- * @brief Test Function
- *
- * A test Event callback function
- *
- * @param      name The name of the originating Event
- * @param[out] data The optional data given with the Event trigger
- */
-void Test::test_func(std::string name, void* data) {
-  Logger::stack(__FUNCTION__);
-  std::ostringstream oss;
-  oss << data;
-  Logger::devel("data: " + oss.str());
-  Logger::debug("Event \"" + name + "\" callback: (const char*)\""
-    + std::string{(const char*)data} + "\"");
-  Logger::stack(__FUNCTION__, true);
 }
 
 /**

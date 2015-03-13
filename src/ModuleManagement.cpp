@@ -8,20 +8,18 @@
  * @date    January 23, 2015
  */
 
-#include <cstring>
 #include <dlfcn.h>
-#include <iostream>
 #include <libgen.h>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string.h>
 #include <vector>
 #include "../include/Logger.h"
 #include "../include/Module.h"
 #include "../include/ModuleInstance.h"
 #include "../include/ModuleManagement.h"
 
-// Initialize the modules vector
 std::map<std::string, std::shared_ptr<ModuleInstance>>
   ModuleManagement::modules{};
 
@@ -125,7 +123,7 @@ bool ModuleManagement::loadModule(const std::string& name) {
             // Module loaded successfully
             status = true;
             Logger::info("Loaded Module \"" + name
-              + "\" ...");
+              + "\"");
           }
           else {
             // Unload the module

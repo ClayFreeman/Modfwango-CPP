@@ -26,7 +26,7 @@ class Connection {
     Connection(const Connection&);
     Connection& operator= (const Connection&);
     std::string& ltrim(std::string& s) const;
-    void         reset() const;
+    void         reset();
     std::string& rtrim(std::string& s) const;
     std::string& trim(std::string& s) const;
   public:
@@ -34,7 +34,7 @@ class Connection {
         std::shared_ptr<FileDescriptor> sock):
       host{addr}, port{portno}, sockfd{sock} {}
     ~Connection();
-    std::string                     getData() const;
+    std::string                     getData();
     const std::string&              getHost() const;
     int                             getPort() const;
     std::shared_ptr<FileDescriptor> getSock() const;

@@ -44,7 +44,7 @@ std::string& Connection::trim(std::string& s) const {
   return this->ltrim(this->rtrim(s));
 }
 
-std::string Connection::getData() const {
+std::string Connection::getData() {
   std::string retVal;
 
   if (this->isValid()) {
@@ -91,11 +91,11 @@ bool Connection::isValid() const {
   return fcntl(*this->sockfd, F_GETFD) != -1 || errno != EBADF;
 }
 
-void Connection::reset() const {
+void Connection::reset() {
   if (this->isValid()) {
     Logger::debug("Connection " + this->host + ":" +
       std::to_string(this->port) + " closed");
-    close(*this->sockfd);
+    this->sockfd.reset();
   }
 }
 

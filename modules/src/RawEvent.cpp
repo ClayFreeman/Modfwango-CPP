@@ -39,7 +39,7 @@ void RawEvent::receiveRaw(const std::string& name,
   Logger::stack(__FUNCTION__);
 
   RawEventData rawEventData{connection, data};
-  EventHandling::triggerEvent("rawEvent", (void*)&rawEventData);
+  EventHandling::triggerEvent(name, (void*)&rawEventData);
 
   Logger::stack(__FUNCTION__, true);
 }

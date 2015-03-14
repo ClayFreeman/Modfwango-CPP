@@ -23,6 +23,8 @@ class SocketManagement {
     SocketManagement() {}
   public:
     static void        acceptConnections();
+    static void        closeAll();
+    static int         count();
     static bool        destroySocket(const std::string& addr, int port);
     static const std::map<std::string, std::shared_ptr<Socket>>& getSockets()
       { return SocketManagement::sockets; }

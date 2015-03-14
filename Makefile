@@ -29,13 +29,13 @@ WARN		:= \x1b[33;01m
 ################################### INTERNAL ###################################
 
 # Don't touch these variables
-LIBS		= $(shell touch .Makefile-libs && cat .Makefile-libs)
-MODSDIR		= $(shell touch .Makefile-modsdir && cat .Makefile-modsdir)
+LIBS		 = $(shell touch .Makefile-libs && cat .Makefile-libs)
+MODSDIR		 = $(shell touch .Makefile-modsdir && cat .Makefile-modsdir)
 
 ifneq ($(words $(shell touch .Makefile-out && cat .Makefile-out)),0)
-OUT		= $(shell cat .Makefile-out)
+OUT		 = $(shell cat .Makefile-out)
 else
-OUT		= $(DIR)
+OUT		 = $(DIR)
 endif
 
 RWILDCARD	 = $(wildcard $(addsuffix $2, $1)) $(foreach d,$(wildcard \
@@ -55,14 +55,14 @@ CLEAN		:= $(subst ./,,$(call RWILDCARD,./,*.dSYM)) $(DEPENDO) \
   ############################### UTIL TARGETS ###############################
 
 # Builds and links the application
-target_default =
+target_default	 =
 
 ifeq ($(words $(MAKECMDGOALS)),0)
-target_default = yes
+target_default	 = yes
 endif
 
 ifeq ($(words $(MAKECMDGOALS)),1)
-target_default = yes
+target_default	 = yes
 endif
 
 ifndef target_default

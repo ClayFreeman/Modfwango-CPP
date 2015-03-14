@@ -14,6 +14,14 @@
 
 std::vector<std::shared_ptr<Connection>> ConnectionManagement::connections{};
 
+void ConnectionManagement::closeAll() {
+  ConnectionManagement::connections.clear();
+}
+
+int ConnectionManagement::count() {
+  return ConnectionManagement::connections.size();
+}
+
 const std::vector<std::shared_ptr<Connection>>&
     ConnectionManagement::getConnections() {
   return ConnectionManagement::connections;

@@ -11,6 +11,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include "../include/Connection.h"
 #include "../include/Event.h"
 #include "../include/EventHandling.h"
 #include "../include/EventPreprocessor.h"
@@ -36,7 +37,8 @@ std::map<std::string, std::shared_ptr<Event>> EventHandling::events{};
  * @return true if the Event was created, false otherwise
  */
 bool EventHandling::createEvent(const std::string& name,
-    const std::string& parentModule, void (*callback)(std::string, void*)) {
+    const std::string& parentModule, void (*callback)(const std::string&,
+    std::shared_ptr<Connection>, std::string)) {
   bool status = false;
   // Prevent duplicate event names and make sure the parentModule exists (if
   // specified)
@@ -72,6 +74,13 @@ bool EventHandling::destroyEvent(const std::string& name) {
   return EventHandling::events.erase(name) > 0;
 }
 
+void EventHandling::receiveData(std::shared_ptr<Connection> c,
+    const std::string& data) {
+  for (auto i : EventHandling::events) {
+    i.second->call(c, data);
+  }
+}
+
 /**
  * @brief Register for Event
  *
@@ -90,8 +99,8 @@ bool EventHandling::destroyEvent(const std::string& name) {
  *   otherwise
  */
 bool EventHandling::registerForEvent(const std::string& name,
-    const std::string& parentModule, void (*callback)(std::string, void*),
-    const int& priority) {
+    const std::string& parentModule, void (*callback)(const std::string&,
+    void*), const int& priority) {
   bool status = false;
   // Make sure the Event exists, and if specified, the Module exists
   if (EventHandling::events.count(name) > 0 &&
@@ -134,7 +143,7 @@ bool EventHandling::registerForEvent(const std::string& name,
  *   otherwise
  */
 bool EventHandling::registerPreprocessorForEvent(const std::string& name,
-    const std::string& parentModule, bool (*callback)(std::string),
+    const std::string& parentModule, bool (*callback)(const std::string&),
     const int& priority) {
   bool status = false;
   // Make sure the Event exists, and if specified, the Module exists

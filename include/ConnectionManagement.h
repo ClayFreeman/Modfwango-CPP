@@ -21,6 +21,8 @@ class ConnectionManagement {
     // Prevent this class from being instantiated
     ConnectionManagement() {}
   public:
+    static int  count();
+    static void closeAll();
     static const std::vector<std::shared_ptr<Connection>>& getConnections();
     static void newConnection(const std::shared_ptr<Connection>& c);
     static void pruneConnections();

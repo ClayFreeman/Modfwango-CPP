@@ -14,6 +14,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include "Connection.h"
 #include "Event.h"
 
 class EventHandling {
@@ -24,13 +25,16 @@ class EventHandling {
   public:
     static bool createEvent(const std::string& name,
       const std::string& parentModule = "",
-      void (*callback)(std::string, void*) = nullptr);
+      void (*callback)(const std::string&, std::shared_ptr<Connection>,
+      std::string) = nullptr);
     static bool destroyEvent(const std::string& name);
+    static void receiveData(std::shared_ptr<Connection> c,
+      const std::string& data);
     static bool registerForEvent(const std::string& name,
-      const std::string& parentModule, void (*callback)(std::string, void*),
-      const int& priority = 0);
+      const std::string& parentModule, void (*callback)(const std::string&,
+      void*), const int& priority = 0);
     static bool registerPreprocessorForEvent(const std::string& name,
-      const std::string& parentModule, bool (*callback)(std::string),
+      const std::string& parentModule, bool (*callback)(const std::string&),
       const int& priority = 0);
     static bool triggerEvent(const std::string& name, void* data = nullptr);
     static bool unregisterEvents(const std::string& parentModule);

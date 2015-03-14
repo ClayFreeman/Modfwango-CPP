@@ -8,7 +8,6 @@
  * @date       March 13, 2015
  */
 
-#include <algorithm>
 #include <arpa/inet.h>
 #include <map>
 #include <memory>
@@ -30,6 +29,14 @@ void SocketManagement::acceptConnections() {
     catch (const std::runtime_error&) {}
     catch (const std::exception&) {}
   }
+}
+
+void SocketManagement::closeAll() {
+  SocketManagement::sockets.clear();
+}
+
+int SocketManagement::count() {
+  return SocketManagement::sockets.size();
 }
 
 bool SocketManagement::destroySocket(const std::string& addr, int port) {

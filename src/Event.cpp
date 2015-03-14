@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "../include/Connection.h"
 #include "../include/Event.h"
 #include "../include/EventRegistration.h"
 #include "../include/Logger.h"
@@ -27,7 +28,8 @@
  * @param dataCallback A pointer to a method to handle data callbacks (optional)
  */
 Event::Event(const std::string& n, const std::string& parentMod,
-  void (*dataCall)(std::string, void*)): name{n}, parentModule{parentMod},
+  void (*dataCall)(const std::string&, std::shared_ptr<Connection>,
+  std::string)): name{n}, parentModule{parentMod},
   dataCallback{dataCall} {}
 
 /**
@@ -58,6 +60,10 @@ void Event::addPreprocessor(const int& priority,
   // Add this EventPreprocessor for the provided priority to the end of
   // the vector
   this->preprocessors[priority].push_back(preprocessor);
+}
+
+void Event::call(std::shared_ptr<Connection> c, const std::string& data) const {
+  if (this->dataCallback != nullptr) this->dataCallback(this->name, c, data);
 }
 
 /**

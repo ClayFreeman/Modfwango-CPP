@@ -20,8 +20,8 @@
  * @param parentModule The name of the parent Module
  * @param callback     Pointer to the callback function
  */
-EventPreprocessor::EventPreprocessor(std::string parentMod,
-  bool (*call)(std::string)): parentModule{parentMod}, callback{call} {}
+EventPreprocessor::EventPreprocessor(const std::string& parentMod,
+  bool (*call)(const std::string&)): parentModule{parentMod}, callback{call} {}
 
 const std::string& EventPreprocessor::getParentModule() const {
   return this->parentModule;

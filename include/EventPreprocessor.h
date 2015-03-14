@@ -16,13 +16,13 @@
 class EventPreprocessor {
   private:
     std::string parentModule{};
-    bool (*callback)(std::string) = nullptr;
+    bool (*callback)(const std::string&) = nullptr;
     // Make sure copying is disallowed
     EventPreprocessor(const EventPreprocessor&);
     EventPreprocessor& operator= (const EventPreprocessor&);
   public:
-    EventPreprocessor(std::string parentModule,
-      bool (*callback)(std::string) = nullptr);
+    EventPreprocessor(const std::string& parentModule,
+      bool (*callback)(const std::string&) = nullptr);
     const std::string& getParentModule() const;
     bool call(const std::string& name) const;
 };

@@ -16,13 +16,13 @@
 class EventRegistration {
   private:
     std::string parentModule{};
-    void (*callback)(std::string, void*) = nullptr;
+    void (*callback)(const std::string&, void*) = nullptr;
     // Make sure copying is disallowed
     EventRegistration(const EventRegistration&);
     EventRegistration& operator= (const EventRegistration&);
   public:
-    EventRegistration(std::string parentModule,
-      void (*callback)(std::string, void*) = nullptr);
+    EventRegistration(const std::string& parentModule,
+      void (*callback)(const std::string&, void*) = nullptr);
     const std::string& getParentModule() const;
     void call(const std::string& name, void* data) const;
 };

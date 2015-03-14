@@ -14,6 +14,9 @@
 #include "../include/Module.h"
 #include "../include/ModuleInstance.h"
 
+ModuleInstance::ModuleInstance(const std::shared_ptr<Module>& m,
+  const std::shared_ptr<void>& o): module{m}, object{o} {}
+
 /**
  * @brief Destructor
  *

@@ -23,12 +23,12 @@ class Module {
   protected:
     void setName(const std::string& name);
   public:
-    Module() {}
-    virtual ~Module() {}
+    Module();
+    virtual ~Module();
     // Each Module needs a getter for its name
-    const std::string& getName() const { return this->name; }
+    const std::string& getName() const;
     // Each Module needs an isInstantiated method
-    virtual bool isInstantiated() { return true; }
+    virtual bool isInstantiated();
 };
 
 #endif

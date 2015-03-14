@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <functional>
 #include <locale>
+#include <memory>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string>
@@ -20,6 +21,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "../include/Connection.h"
+#include "../include/FileDescriptor.h"
 #include "../include/Logger.h"
 
 Connection::~Connection() {
@@ -48,13 +50,13 @@ std::string Connection::getData() const {
   if (this->isValid()) {
     fd_set rfds;
     FD_ZERO(&rfds);
-    FD_SET(this->sockfd, &rfds);
+    FD_SET(*this->sockfd, &rfds);
     struct timeval timeout{0, 0};
-    select(this->sockfd + 1, &rfds, nullptr, nullptr, &timeout);
+    select(*this->sockfd + 1, &rfds, nullptr, nullptr, &timeout);
 
-    if (FD_ISSET(this->sockfd, &rfds)) {
+    if (FD_ISSET(*this->sockfd, &rfds)) {
       char* buffer = (char*)calloc(8192, sizeof(char));
-      ssize_t count = read(this->sockfd, buffer, 8191);
+      ssize_t count = read(*this->sockfd, buffer, 8191);
       retVal = buffer;
       free(buffer);
       trim(retVal);
@@ -73,14 +75,30 @@ std::string Connection::getData() const {
   return retVal;
 }
 
+const std::string& Connection::getHost() const {
+  return this->host;
+}
+
+int Connection::getPort() const {
+  return this->port;
+}
+
+std::shared_ptr<FileDescriptor> Connection::getSock() const {
+  return this->sockfd;
+}
+
+bool Connection::isValid() const {
+  return fcntl(*this->sockfd, F_GETFD) != -1 || errno != EBADF;
+}
+
 void Connection::reset() const {
   if (this->isValid()) {
     Logger::debug("Connection " + this->host + ":" +
       std::to_string(this->port) + " closed");
-    close(this->sockfd);
+    close(*this->sockfd);
   }
 }
 
 void Connection::send(const std::string& data) const {
-  if (this->isValid()) write(this->sockfd, data.c_str(), data.length());
+  if (this->isValid()) write(*this->sockfd, data.c_str(), data.length());
 }

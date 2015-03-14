@@ -12,6 +12,20 @@
 #include "../include/Logger.h"
 #include "../include/Module.h"
 
+Module::Module() {}
+
+Module::~Module() {}
+
+// Each Module needs a getter for its name
+const std::string& Module::getName() const {
+  return this->name;
+}
+
+// Each Module needs an isInstantiated method
+bool Module::isInstantiated() {
+  return true;
+}
+
 /**
  * @brief Set Name
  *

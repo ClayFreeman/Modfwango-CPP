@@ -26,13 +26,9 @@
  * @param parentModule The name of the parent Module
  * @param dataCallback A pointer to a method to handle data callbacks (optional)
  */
-Event::Event(const std::string& name, const std::string& parentModule,
-    void (*dataCallback)(std::string, void*)) {
-  // Initialize the Event with the provided data
-  this->name = name;
-  this->parentModule = parentModule;
-  this->dataCallback = dataCallback;
-}
+Event::Event(const std::string& n, const std::string& parentMod,
+  void (*dataCall)(std::string, void*)): name{n}, parentModule{parentMod},
+  dataCallback{dataCall} {}
 
 /**
  * @brief Add Registration

@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <string>
 #include "../include/ConnectionManagement.h"
+#include "../include/FileDescriptorPool.h"
 #include "../include/Logger.h"
 #include "../include/Socket.h"
 #include "../include/SocketManagement.h"
@@ -79,22 +80,8 @@ bool SocketManagement::newSocket(const std::string& addr, int port) {
 }
 
 void SocketManagement::stall() {
-  int max = -1;
-
-  // Prepare file descriptor set
-  fd_set rfds;
-  FD_ZERO(&rfds);
-  for (auto i : SocketManagement::getSockets()) {
-    FD_SET(i.second->getSock(), &rfds);
-    if (i.second->getSock() > max)
-      max = i.second->getSock();
-  }
-  for (auto i : ConnectionManagement::getConnections()) {
-    FD_SET(i->getSock(), &rfds);
-    if (i->getSock() > max)
-      max = i->getSock();
-  }
-
+  // Get the current fd_set
+  fd_set rfds = FileDescriptorPool::get();
   // Wait on all sockets
-  select(++max, &rfds, nullptr, nullptr, nullptr);
+  select(FileDescriptorPool::max(), &rfds, nullptr, nullptr, nullptr);
 }

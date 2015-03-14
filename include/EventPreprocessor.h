@@ -23,7 +23,7 @@ class EventPreprocessor {
   public:
     EventPreprocessor(std::string parentModule,
       bool (*callback)(std::string) = nullptr);
-    const std::string& getParentModule() const { return this->parentModule; }
+    const std::string& getParentModule() const;
     bool call(const std::string& name) const;
 };
 

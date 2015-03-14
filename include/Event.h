@@ -39,8 +39,9 @@ class Event {
       const std::shared_ptr<EventPreprocessor>& preprocessor);
     void delRegistration(const std::string& parentModule);
     void delPreprocessor(const std::string& parentModule);
-    const std::string& getName() const { return this->name; }
-    const std::string& getParentModule() const { return this->parentModule; }
+    const inline std::string& getName() const { return this->name; }
+    const inline std::string& getParentModule() const
+      { return this->parentModule; }
     void trigger(void* data) const;
 };
 

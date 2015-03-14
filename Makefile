@@ -13,8 +13,7 @@ BASHFLAGS	:= -c
 CPPCHECK	:= cppcheck
 CPPCHECKFLAGS	:= --enable=warning,style,performance,portability --std=posix
 CXX		:= g++
-CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -fPIC -rdynamic \
-			-DDEBUG=0
+CXXFLAGS	:= -g -std=c++11 -Wall -Wextra -pedantic -fPIC -DDEBUG=0
 VALGRIND	:= valgrind
 VALGRINDFLAGS	:= --tool=memcheck --leak-check=full --dsymutil=yes \
 			--show-leak-kinds=all
@@ -116,7 +115,7 @@ endif
 # Links your application.  Depends on all applicable .o files
 $(OUT):		$(DEPENDO)
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(OK)LNK$(RESET)] $@ ...\""
-	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) $(CXXFLAGS) -rdynamic -o $@ $^ $(LIBS)
 
 # Builds a ZIP file from your source files and Makefile
 $(OUT).zip:	$(DEPENDCPP) $(DEPENDMODULES) $(DEPENDH) Makefile
@@ -127,8 +126,13 @@ $(OUT).zip:	$(DEPENDCPP) $(DEPENDMODULES) $(DEPENDH) Makefile
 # Builds any object file from a CPP file
 %.o:		%.cpp | $(DEPENDH)
 	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
-	@$(CXX) $(CXXFLAGS) -o $@ -c $^
+	@$(CXX) $(CXXFLAGS) -c -o $@ $^
 
 %.so:		%.cpp | $(DEPENDH)
-	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CXX$(RESET)] $@ ...\""
-	@$(CXX) $(CXXFLAGS) -o $@ -shared $^
+	@$(BASH) $(BASHFLAGS) "echo -e \"[$(WARN)CSO$(RESET)] $@ ...\""
+ifneq ($(shell uname),Darwin)
+	@$(CXX) $(CXXFLAGS) -shared -o $@ $^
+else
+	@$(CXX) $(CXXFLAGS) -dynamiclib -undefined suppress -flat_namespace \
+		-o $@ $^
+endif

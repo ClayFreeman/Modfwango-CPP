@@ -21,10 +21,8 @@ class ConnectionManagement {
     // Prevent this class from being instantiated
     ConnectionManagement() {}
   public:
-    static const std::vector<std::shared_ptr<Connection>>& getConnections()
-      { return ConnectionManagement::connections; }
-    static void newConnection(const std::shared_ptr<Connection>& c)
-      { ConnectionManagement::connections.push_back(c); }
+    static const std::vector<std::shared_ptr<Connection>>& getConnections();
+    static void newConnection(const std::shared_ptr<Connection>& c);
     static void pruneConnections();
 };
 

@@ -13,13 +13,15 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <memory>
 #include <string>
+#include "FileDescriptor.h"
 
 class Connection {
   private:
-    std::string  host   = "0.0.0.0";
-    int          port   = 0;
-    int          sockfd = 0;
+    std::string                     host   = "0.0.0.0";
+    int                             port   = 0;
+    std::shared_ptr<FileDescriptor> sockfd = nullptr;
     // Make sure copying is disallowed
     Connection(const Connection&);
     Connection& operator= (const Connection&);
@@ -28,16 +30,16 @@ class Connection {
     std::string& rtrim(std::string& s) const;
     std::string& trim(std::string& s) const;
   public:
-    Connection(const std::string& addr, int portno, int sock):
+    Connection(const std::string& addr, int portno,
+        std::shared_ptr<FileDescriptor> sock):
       host{addr}, port{portno}, sockfd{sock} {}
     ~Connection();
-    std::string        getData() const;
-    const std::string& getHost() const { return this->host; }
-    int                getPort() const { return this->port; }
-    int                getSock() const { return this->sockfd; }
-    bool               isValid() const
-      { return fcntl(this->sockfd, F_GETFD) != -1 || errno != EBADF; };
-    void               send(const std::string& data) const;
+    std::string                     getData() const;
+    const std::string&              getHost() const;
+    int                             getPort() const;
+    std::shared_ptr<FileDescriptor> getSock() const;
+    bool                            isValid() const;
+    void                            send(const std::string& data) const;
 };
 
 #endif

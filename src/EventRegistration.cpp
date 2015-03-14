@@ -20,10 +20,11 @@
  * @param parentModule The name of the parent Module
  * @param callback     Pointer to the callback function
  */
-EventRegistration::EventRegistration(std::string parentModule,
-    void (*callback)(std::string, void*)) {
-  this->parentModule = parentModule;
-  this->callback = callback;
+EventRegistration::EventRegistration(std::string parentMod,
+  void (*call)(std::string, void*)): parentModule{parentMod}, callback{call} {}
+
+const std::string& EventRegistration::getParentModule() const {
+  return this->parentModule;
 }
 
 /**

@@ -18,6 +18,7 @@
 #include <time.h>
 #include "include/ConnectionManagement.h"
 #include "include/EventHandling.h"
+#include "include/File.h"
 #include "include/Logger.h"
 #include "include/ModuleManagement.h"
 #include "include/Runtime.h"
@@ -62,20 +63,8 @@ int main(int argc, char* const argv[]) {
   // Create directories/files
   mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),
     S_IRWXU | S_IRWXG | S_IRWXO);
-  std::ifstream check;
-  std::ofstream file;
-  check.open(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
-  if (!check) {
-    file.open(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
-    file.close();
-  }
-  check.close();
-  check.open(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
-  if (!check) {
-    file.open(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
-    file.close();
-  }
-  check.close();
+  File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
+  File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
 
   // Load modules
   std::string module;

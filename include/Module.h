@@ -23,8 +23,8 @@ class Module {
   protected:
     void setName(const std::string& name);
   public:
-    Module();
-    virtual ~Module();
+    Module() = default;
+    virtual ~Module() = default;
     // Each Module needs a getter for its name
     const std::string& getName() const;
     // Each Module needs an isInstantiated method

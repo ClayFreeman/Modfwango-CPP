@@ -34,6 +34,17 @@ bool RawEvent::isInstantiated() {
   return true;
 }
 
+/**
+ * @brief Receive Raw
+ *
+ * Event data callback to intercept all incoming data (data from Sockets held by
+ * SocketManagement)
+ *
+ * @param      name       The name of the received event
+ * @param[out] connection A pointer to the Connection from which the data was
+ *                        received
+ * @param      data       The data that was received
+ */
 void RawEvent::receiveRaw(const std::string& name,
     std::shared_ptr<Connection> connection, std::string data) {
   Logger::stack(__FUNCTION__);

@@ -24,6 +24,13 @@ EventRegistration::EventRegistration(const std::string& parentMod,
   void (*call)(const std::string&, void*)): parentModule{parentMod},
   callback{call} {}
 
+/**
+ * @brief Get Parent Module
+ *
+ * Returns the name of the module that owns this registration
+ *
+ * @return std::string name of parent module
+ */
 const std::string& EventRegistration::getParentModule() const {
   return this->parentModule;
 }

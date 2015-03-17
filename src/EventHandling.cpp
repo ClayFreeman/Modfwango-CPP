@@ -74,7 +74,15 @@ bool EventHandling::destroyEvent(const std::string& name) {
   return EventHandling::events.erase(name) > 0;
 }
 
-void EventHandling::receiveData(std::shared_ptr<Connection> c,
+/**
+ * @brief Receive Data
+ *
+ * Triggers each Event's data callback with the provided Connection and data
+ *
+ * @param c    The Connection in which the data was received
+ * @param data The data received
+ */
+void EventHandling::receiveData(const std::shared_ptr<Connection>& c,
     const std::string& data) {
   for (auto i : EventHandling::events) {
     i.second->call(c, data);

@@ -22,6 +22,14 @@
 #include "../include/Logger.h"
 #include "../include/Socket.h"
 
+/**
+ * @brief Socket
+ *
+ * Constructs a Socket to listen on the provided address and port number
+ *
+ * @param parameter1 description of parameter1
+ * @param parameter2 parameter2 is an output parameter.
+ */
 Socket::Socket(const std::string& addr, int portno): host{addr}, port{portno} {
   // Prepare the listen address
   struct sockaddr_in serv_addr;
@@ -59,7 +67,15 @@ Socket::~Socket() {
   }
 }
 
+/**
+ * @brief Accept Connection
+ *
+ * Accepts an incoming connection (if existent) and returns a Connection
+ *
+ * @return A Connection
+ */
 std::shared_ptr<Connection> Socket::acceptConnection() const {
+  // Allocate storage for accepting a client
   struct sockaddr_in cli_addr;
   socklen_t cli_addr_len = sizeof(cli_addr);
   memset(&cli_addr, 0, cli_addr_len);
@@ -67,16 +83,22 @@ std::shared_ptr<Connection> Socket::acceptConnection() const {
     new FileDescriptor{}
   };
 
+  // Check if the Socket is valid
   if (this->isValid()) {
+    // Setup storage to determine if a connection is incoming
     fd_set rfds;
     FD_ZERO(&rfds);
     FD_SET(*this->sockfd, &rfds);
     struct timeval timeout{0, 0};
+    // Use select with a timeout of 0 to determine status
     select(*this->sockfd + 1, &rfds, nullptr, nullptr, &timeout);
 
+    // If Socket is marked as read available, a client is connecting
     if (FD_ISSET(*this->sockfd, &rfds)) {
+      // Accept the client
       *cli_fd = accept(*this->sockfd, (struct sockaddr*)&cli_addr,
         &cli_addr_len);
+      // If cli_fd is negative, an error occurred
       if (*cli_fd < 0) {
         throw std::runtime_error{"Couldn't accept client on " + this->host +
           ":" + std::to_string(this->port) +
@@ -84,11 +106,13 @@ std::shared_ptr<Connection> Socket::acceptConnection() const {
       }
     }
     else {
+      // There is no incoming connection
       throw std::exception{/*"Couldn't accept client on " + this->host +
         ":" + std::to_string(this->port) + " - No incoming connections"*/};
     }
   }
   else {
+    // This Socket is invalid
     throw std::runtime_error{"Couldn't accept client on " + this->host +
       ":" + std::to_string(this->port) + " - Invalid socket"};
   }
@@ -103,18 +127,46 @@ std::shared_ptr<Connection> Socket::acceptConnection() const {
   };
 }
 
+/**
+ * @brief Get Host
+ *
+ * Fetches the host on which the Socket is listening
+ *
+ * @return The host
+ */
 const std::string& Socket::getHost() const {
   return this->host;
 }
 
+/**
+ * @brief Get Port
+ *
+ * Fetches the port on which the Socket is listening
+ *
+ * @return The port
+ */
 int Socket::getPort() const {
   return this->port;
 }
 
+/**
+ * @brief Get Socket
+ *
+ * Fetches the file descriptor for the associated Socket
+ *
+ * @return A pointer to the Socket's file descriptor
+ */
 std::shared_ptr<FileDescriptor> Socket::getSock() const {
   return this->sockfd;
 }
 
+/**
+ * @brief Is Valid
+ *
+ * Checks if the Socket is valid for operation (open)
+ *
+ * @return true if valid, false otherwise
+ */
 bool Socket::isValid() const {
   return fcntl(*this->sockfd, F_GETFD) != -1 || errno != EBADF;
 }

@@ -12,10 +12,6 @@
 #include "../include/Logger.h"
 #include "../include/Module.h"
 
-Module::Module() {}
-
-Module::~Module() {}
-
 // Each Module needs a getter for its name
 const std::string& Module::getName() const {
   return this->name;

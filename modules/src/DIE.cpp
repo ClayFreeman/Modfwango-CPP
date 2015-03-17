@@ -36,6 +36,17 @@ bool DIE::isInstantiated() {
   return true;
 }
 
+/**
+ * @brief Receive Raw
+ *
+ * Event callback for the RawEvent (provides a RawEventData struct)
+ *
+ * @remarks
+ * Incoming data is a RawEventData struct (see modules/include/RawEvent.h)
+ *
+ * @param      name The name of the received event
+ * @param[out] data A pointer to a RawEventData struct
+ */
 void DIE::receiveRaw(const std::string& name, void* data) {
   Logger::stack(__FUNCTION__);
 

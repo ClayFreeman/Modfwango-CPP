@@ -23,6 +23,13 @@
 EventPreprocessor::EventPreprocessor(const std::string& parentMod,
   bool (*call)(const std::string&)): parentModule{parentMod}, callback{call} {}
 
+/**
+ * @brief Get Parent Module
+ *
+ * Returns the name of the module that owns this registration
+ *
+ * @return std::string name of parent module
+ */
 const std::string& EventPreprocessor::getParentModule() const {
   return this->parentModule;
 }

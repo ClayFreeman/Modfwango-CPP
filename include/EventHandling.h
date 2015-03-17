@@ -28,7 +28,7 @@ class EventHandling {
       void (*callback)(const std::string&, std::shared_ptr<Connection>,
       std::string) = nullptr);
     static bool destroyEvent(const std::string& name);
-    static void receiveData(std::shared_ptr<Connection> c,
+    static void receiveData(const std::shared_ptr<Connection>& c,
       const std::string& data);
     static bool registerForEvent(const std::string& name,
       const std::string& parentModule, void (*callback)(const std::string&,

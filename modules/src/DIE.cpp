@@ -53,7 +53,9 @@ void DIE::receiveRaw(const std::string& name, void* data) {
 
   RawEventData* rawEventData = (RawEventData*)data;
   if (rawEventData->d == "DIE") {
-    rawEventData->c->send(name + "\n");
+    Logger::info("Shutting down...");
+    for (auto i : ConnectionManagement::getConnections())
+      i->send("Shutting down...\n");
     Runtime::add("__DIE__", "1");
   }
 

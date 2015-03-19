@@ -83,5 +83,5 @@ bool Logger::setMode(short m) {
 void Logger::stack(const std::string& func, bool end) {
   if (func.length() > 0 && Logger::getMode() & LOG_STACK) std::cout
     << COLOR_STACK << " STACK " << COLOR_RESET << '|'
-    << (end == true ? "-" : "+") << func << ";\n";
+    << (end == true ? "- " : "+ ") << func << ";\n";
 }

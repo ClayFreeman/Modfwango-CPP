@@ -26,7 +26,7 @@ std::map<std::string, std::string> Runtime::options{};
  */
 bool Runtime::add(const std::string& key, const std::string& value) {
   bool retVal = false;
-  if (Runtime::options.count(key) == 0) {
+  if (Runtime::options.count(key) == 0 || Runtime::options[key].length() == 0) {
     Runtime::options[key] = value;
     retVal = true;
   }

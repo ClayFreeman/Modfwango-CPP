@@ -12,6 +12,7 @@
 #include "../include/Logger.h"
 
 short Logger::mode = (DEBUG == 1 ? LOG_ALL : LOG_INFO);
+short Logger::indent = 0;
 
 /**
  * @brief Debug
@@ -21,8 +22,12 @@ short Logger::mode = (DEBUG == 1 ? LOG_ALL : LOG_INFO);
  * @param msg The message to print
  */
 void Logger::debug(const std::string& msg) {
-  if (msg.length() > 0 && Logger::getMode() & LOG_DEBUG) std::cout
-    << COLOR_DEBUG << " DEBUG " << COLOR_RESET << "| " << msg << '\n';
+  if (msg.length() > 0 && Logger::getMode() & LOG_DEBUG) {
+    std::cout << COLOR_DEBUG << " DEBUG " << COLOR_RESET;
+    for (int i = 0; i < Logger::indent; i++)
+      std::cout << "  ";
+    std::cout << "| " << msg << '\n';
+  }
 }
 
 /**
@@ -33,8 +38,12 @@ void Logger::debug(const std::string& msg) {
  * @param msg The message to print
  */
 void Logger::devel(const std::string& msg) {
-  if (msg.length() > 0 && Logger::getMode() & LOG_DEVEL) std::cout
-    << COLOR_DEVEL << " DEVEL " << COLOR_RESET << "| " << msg << '\n';
+  if (msg.length() > 0 && Logger::getMode() & LOG_DEVEL) {
+    std::cout << COLOR_DEVEL << " DEVEL " << COLOR_RESET;
+    for (int i = 0; i < Logger::indent; i++)
+      std::cout << "  ";
+    std::cout << "| " << msg << '\n';
+  }
 }
 
 /**
@@ -56,8 +65,12 @@ short Logger::getMode() {
  * @param msg The message to print
  */
 void Logger::info(const std::string& msg) {
-  if (msg.length() > 0 && Logger::getMode() & LOG_INFO) std::cout << COLOR_INFO
-    << "  INFO " << COLOR_RESET << "| " << msg << '\n';
+  if (msg.length() > 0 && Logger::getMode() & LOG_INFO) {
+    std::cout << COLOR_INFO << "  INFO " << COLOR_RESET;
+    for (int i = 0; i < Logger::indent; i++)
+      std::cout << "  ";
+    std::cout << "| " << msg << '\n';
+  }
 }
 
 /**
@@ -81,7 +94,12 @@ bool Logger::setMode(short m) {
  * @param msg The message to print
  */
 void Logger::stack(const std::string& func, bool end) {
-  if (func.length() > 0 && Logger::getMode() & LOG_STACK) std::cout
-    << COLOR_STACK << " STACK " << COLOR_RESET
-    << (end == true ? "- " : "+ ") << func << ";\n";
+  if (end == false && Logger::indent > 0) Logger::indent--
+  if (func.length() > 0 && Logger::getMode() & LOG_STACK) {
+    std::cout << COLOR_STACK << " STACK " << COLOR_RESET;
+    for (int i = 0; i < Logger::indent; i++)
+      std::cout << "  ";
+    std::cout << (end == true ? "- " : "+ ") << func << ";\n";
+  }
+  if (end == true) Logger::indent++
 }

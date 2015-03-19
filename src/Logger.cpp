@@ -94,12 +94,12 @@ bool Logger::setMode(short m) {
  * @param msg The message to print
  */
 void Logger::stack(const std::string& func, bool end) {
-  if (end == true && Logger::indent > 0) Logger::indent--;
   if (func.length() > 0 && Logger::getMode() & LOG_STACK) {
+    if (end == true && Logger::indent > 0) Logger::indent--;
     std::cout << COLOR_STACK << " STACK " << COLOR_RESET;
     for (int i = 0; i < Logger::indent; i++)
       std::cout << "  ";
     std::cout << (end == true ? "- " : "+ ") << func << ";\n";
+    if (end == false) Logger::indent++;
   }
-  if (end == false) Logger::indent++;
 }

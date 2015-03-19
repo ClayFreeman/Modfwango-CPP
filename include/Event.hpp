@@ -15,9 +15,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "Connection.h"
-#include "EventPreprocessor.h"
-#include "EventRegistration.h"
+#include "Connection.hpp"
+#include "EventPreprocessor.hpp"
+#include "EventRegistration.hpp"
 
 class Event {
   private:

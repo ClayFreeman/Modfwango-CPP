@@ -13,11 +13,11 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include "../include/ConnectionManagement.h"
-#include "../include/FileDescriptorPool.h"
-#include "../include/Logger.h"
-#include "../include/Socket.h"
-#include "../include/SocketManagement.h"
+#include "../include/ConnectionManagement.hpp"
+#include "../include/FileDescriptorPool.hpp"
+#include "../include/Logger.hpp"
+#include "../include/Socket.hpp"
+#include "../include/SocketManagement.hpp"
 
 std::map<std::string, std::shared_ptr<Socket>> SocketManagement::sockets{};
 

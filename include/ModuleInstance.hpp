@@ -13,8 +13,8 @@
 
 #include <dlfcn.h>
 #include <memory>
-#include "Logger.h"
-#include "Module.h"
+#include "Logger.hpp"
+#include "Module.hpp"
 
 template<class T>
 void delete_dlobject(void* p) {

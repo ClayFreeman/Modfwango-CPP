@@ -13,10 +13,10 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "../include/Connection.h"
-#include "../include/Event.h"
-#include "../include/EventRegistration.h"
-#include "../include/Logger.h"
+#include "../include/Connection.hpp"
+#include "../include/Event.hpp"
+#include "../include/EventRegistration.hpp"
+#include "../include/Logger.hpp"
 
 /**
  * @brief Constructor

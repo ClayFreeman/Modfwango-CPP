@@ -10,11 +10,11 @@
 
 #include <memory>
 #include <string>
-#include "../include/RawEvent.h"
-#include "../../include/Connection.h"
-#include "../../include/EventHandling.h"
-#include "../../include/Module.h"
-#include "../../include/Logger.h"
+#include "../include/RawEvent.hpp"
+#include "../../include/Connection.hpp"
+#include "../../include/EventHandling.hpp"
+#include "../../include/Module.hpp"
+#include "../../include/Logger.hpp"
 
 /**
  * @brief Is Instantiated

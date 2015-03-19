@@ -12,7 +12,7 @@
 #define _DIE_H
 
 #include <string>
-#include "../../include/Module.h"
+#include "../../include/Module.hpp"
 
 class DIE : public Module {
   public:

@@ -9,8 +9,8 @@
  */
 
 #include <string>
-#include "../include/Logger.h"
-#include "../include/Module.h"
+#include "../include/Logger.hpp"
+#include "../include/Module.hpp"
 
 // Each Module needs a getter for its name
 const std::string& Module::getName() const {

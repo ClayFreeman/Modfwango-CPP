@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <vector>
-#include "../include/ConnectionManagement.h"
+#include "../include/ConnectionManagement.hpp"
 
 std::vector<std::shared_ptr<Connection>> ConnectionManagement::connections{};
 

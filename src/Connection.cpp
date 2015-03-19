@@ -20,9 +20,9 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include "../include/Connection.h"
-#include "../include/FileDescriptor.h"
-#include "../include/Logger.h"
+#include "../include/Connection.hpp"
+#include "../include/FileDescriptor.hpp"
+#include "../include/Logger.hpp"
 
 /**
  * @brief Destructor

@@ -8,7 +8,7 @@
  * @date       March 13, 2015
  */
 
-#include "../include/FileDescriptorPool.h"
+#include "../include/FileDescriptorPool.hpp"
 
 // Initialize fds and max to 0
 fd_set FileDescriptorPool::fds{{0}};

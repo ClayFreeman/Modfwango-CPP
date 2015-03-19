@@ -9,7 +9,7 @@
  */
 
 #include <iostream>
-#include "../include/Logger.h"
+#include "../include/Logger.hpp"
 
 short Logger::mode = (DEBUG == 1 ? LOG_ALL : LOG_INFO);
 short Logger::indent = 0;

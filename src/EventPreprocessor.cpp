@@ -9,8 +9,8 @@
  */
 
 #include <string>
-#include "../include/EventPreprocessor.h"
-#include "../include/Logger.h"
+#include "../include/EventPreprocessor.hpp"
+#include "../include/Logger.hpp"
 
 /**
  * @brief Constructor

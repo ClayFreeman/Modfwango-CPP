@@ -15,8 +15,8 @@
 #include <fcntl.h>
 #include <memory>
 #include <string>
-#include "Connection.h"
-#include "FileDescriptor.h"
+#include "Connection.hpp"
+#include "FileDescriptor.hpp"
 
 class Socket {
   private:

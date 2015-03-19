@@ -10,8 +10,8 @@
 
 #include <fcntl.h>
 #include <errno.h>
-#include "../include/FileDescriptor.h"
-#include "../include/FileDescriptorPool.h"
+#include "../include/FileDescriptor.hpp"
+#include "../include/FileDescriptorPool.hpp"
 
 /**
  * @brief Constructor

@@ -16,13 +16,13 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
-#include "include/ConnectionManagement.h"
-#include "include/EventHandling.h"
-#include "include/File.h"
-#include "include/Logger.h"
-#include "include/ModuleManagement.h"
-#include "include/Runtime.h"
-#include "include/SocketManagement.h"
+#include "include/ConnectionManagement.hpp"
+#include "include/EventHandling.hpp"
+#include "include/File.hpp"
+#include "include/Logger.hpp"
+#include "include/ModuleManagement.hpp"
+#include "include/Runtime.hpp"
+#include "include/SocketManagement.hpp"
 
 int main(int argc, char* const argv[]) {
   // Setup the global __PROJECTROOT__ variable (safely)

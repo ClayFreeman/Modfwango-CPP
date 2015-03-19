@@ -13,7 +13,7 @@
 
 #include <memory>
 #include <vector>
-#include "Connection.h"
+#include "Connection.hpp"
 
 class ConnectionManagement {
   private:

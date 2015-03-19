@@ -14,8 +14,8 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "Module.h"
-#include "ModuleInstance.h"
+#include "Module.hpp"
+#include "ModuleInstance.hpp"
 
 class ModuleManagement {
   private:

@@ -14,8 +14,8 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "Connection.h"
-#include "Event.h"
+#include "Connection.hpp"
+#include "Event.hpp"
 
 class EventHandling {
   private:

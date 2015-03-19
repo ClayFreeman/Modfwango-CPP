@@ -15,10 +15,10 @@
 #include <string>
 #include <string.h>
 #include <vector>
-#include "../include/Logger.h"
-#include "../include/Module.h"
-#include "../include/ModuleInstance.h"
-#include "../include/ModuleManagement.h"
+#include "../include/Logger.hpp"
+#include "../include/Module.hpp"
+#include "../include/ModuleInstance.hpp"
+#include "../include/ModuleManagement.hpp"
 
 std::map<std::string, std::shared_ptr<ModuleInstance>>
   ModuleManagement::modules{};

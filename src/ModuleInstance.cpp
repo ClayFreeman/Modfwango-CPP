@@ -10,9 +10,9 @@
 
 #include <iostream>
 #include <memory>
-#include "../include/Logger.h"
-#include "../include/Module.h"
-#include "../include/ModuleInstance.h"
+#include "../include/Logger.hpp"
+#include "../include/Module.hpp"
+#include "../include/ModuleInstance.hpp"
 
 /**
  * @brief Constructor

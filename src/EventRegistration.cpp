@@ -9,8 +9,8 @@
  */
 
 #include <string>
-#include "../include/EventRegistration.h"
-#include "../include/Logger.h"
+#include "../include/EventRegistration.hpp"
+#include "../include/Logger.hpp"
 
 /**
  * @brief Constructor

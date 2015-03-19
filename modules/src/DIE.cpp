@@ -10,14 +10,14 @@
 
 #include <memory>
 #include <string>
-#include "../include/DIE.h"
-#include "../include/RawEvent.h"
-#include "../../include/ConnectionManagement.h"
-#include "../../include/EventHandling.h"
-#include "../../include/Logger.h"
-#include "../../include/Module.h"
-#include "../../include/Runtime.h"
-#include "../../include/SocketManagement.h"
+#include "../include/DIE.hpp"
+#include "../include/RawEvent.hpp"
+#include "../../include/ConnectionManagement.hpp"
+#include "../../include/EventHandling.hpp"
+#include "../../include/Logger.hpp"
+#include "../../include/Module.hpp"
+#include "../../include/Runtime.hpp"
+#include "../../include/SocketManagement.hpp"
 
 /**
  * @brief Is Instantiated

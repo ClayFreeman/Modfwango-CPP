@@ -11,13 +11,13 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "../include/Connection.h"
-#include "../include/Event.h"
-#include "../include/EventHandling.h"
-#include "../include/EventPreprocessor.h"
-#include "../include/EventRegistration.h"
-#include "../include/Logger.h"
-#include "../include/ModuleManagement.h"
+#include "../include/Connection.hpp"
+#include "../include/Event.hpp"
+#include "../include/EventHandling.hpp"
+#include "../include/EventPreprocessor.hpp"
+#include "../include/EventRegistration.hpp"
+#include "../include/Logger.hpp"
+#include "../include/ModuleManagement.hpp"
 
 // Initialize the events map
 std::map<std::string, std::shared_ptr<Event>> EventHandling::events{};

@@ -13,8 +13,8 @@
 
 #include <memory>
 #include <string>
-#include "../../include/Connection.h"
-#include "../../include/Module.h"
+#include "../../include/Connection.hpp"
+#include "../../include/Module.hpp"
 
 struct RawEventData {
   std::shared_ptr<Connection> c;

@@ -16,6 +16,7 @@
 #include "../../include/EventHandling.h"
 #include "../../include/Logger.h"
 #include "../../include/Module.h"
+#include "../../include/Runtime.h"
 #include "../../include/SocketManagement.h"
 
 /**
@@ -53,11 +54,7 @@ void DIE::receiveRaw(const std::string& name, void* data) {
   RawEventData* rawEventData = (RawEventData*)data;
   if (rawEventData->d == "DIE") {
     rawEventData->c->send(name + "\n");
-    // Close all Connections (will log this Event instance's Connection after
-    // event completion due to the std::shared_ptr<Connection> in use)
-    ConnectionManagement::closeAll();
-    // Close all Sockets
-    SocketManagement::closeAll();
+    Runtime::add("__DIE__", "1");
   }
 
   Logger::stack(__PRETTY_FUNCTION__, true);

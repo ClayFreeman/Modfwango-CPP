@@ -91,7 +91,8 @@ int main(int argc, char* const argv[]) {
   }
   sockets.close();
 
-  while (ConnectionManagement::count() > 0 || SocketManagement::count() > 0) {
+  while ((ConnectionManagement::count() > 0 || SocketManagement::count() > 0) &&
+      Runtime::get("__DIE__").length() == 0) {
     SocketManagement::stall();
     SocketManagement::acceptConnections();
     ConnectionManagement::pruneConnections();

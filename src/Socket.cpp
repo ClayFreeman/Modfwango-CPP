@@ -63,7 +63,7 @@ Socket::~Socket() {
   if (this->isValid()) {
     Logger::debug("Socket " + this->host + ":" + std::to_string(this->port) +
       " closed");
-    close(*this->sockfd);
+    this->sockfd.reset();
   }
 }
 

@@ -27,12 +27,12 @@
  * @return true if loadable, false otherwise
  */
 bool DIE::isInstantiated() {
-  Logger::stack(__FUNCTION__);
+  Logger::stack(__PRETTY_FUNCTION__);
 
   EventHandling::registerForEvent("rawEvent", this->getName(),
     &DIE::receiveRaw);
 
-  Logger::stack(__FUNCTION__, true);
+  Logger::stack(__PRETTY_FUNCTION__, true);
   return true;
 }
 
@@ -48,7 +48,7 @@ bool DIE::isInstantiated() {
  * @param[out] data A pointer to a RawEventData struct
  */
 void DIE::receiveRaw(const std::string& name, void* data) {
-  Logger::stack(__FUNCTION__);
+  Logger::stack(__PRETTY_FUNCTION__);
 
   RawEventData* rawEventData = (RawEventData*)data;
   if (rawEventData->d == "DIE") {
@@ -57,7 +57,7 @@ void DIE::receiveRaw(const std::string& name, void* data) {
     SocketManagement::closeAll();
   }
 
-  Logger::stack(__FUNCTION__, true);
+  Logger::stack(__PRETTY_FUNCTION__, true);
 }
 
 /**

@@ -25,12 +25,12 @@
  * @return true if loadable, false otherwise
  */
 bool RawEvent::isInstantiated() {
-  Logger::stack(__FUNCTION__);
+  Logger::stack(__PRETTY_FUNCTION__);
 
   EventHandling::createEvent("rawEvent", this->getName(),
     &RawEvent::receiveRaw);
 
-  Logger::stack(__FUNCTION__, true);
+  Logger::stack(__PRETTY_FUNCTION__, true);
   return true;
 }
 
@@ -47,12 +47,12 @@ bool RawEvent::isInstantiated() {
  */
 void RawEvent::receiveRaw(const std::string& name,
     std::shared_ptr<Connection> connection, std::string data) {
-  Logger::stack(__FUNCTION__);
+  Logger::stack(__PRETTY_FUNCTION__);
 
   RawEventData rawEventData{connection, data};
   EventHandling::triggerEvent(name, (void*)&rawEventData);
 
-  Logger::stack(__FUNCTION__, true);
+  Logger::stack(__PRETTY_FUNCTION__, true);
 }
 
 /**

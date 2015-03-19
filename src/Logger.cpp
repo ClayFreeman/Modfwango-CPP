@@ -22,7 +22,7 @@ short Logger::mode = (DEBUG == 1 ? LOG_ALL : LOG_INFO);
  */
 void Logger::debug(const std::string& msg) {
   if (msg.length() > 0 && Logger::getMode() & LOG_DEBUG) std::cout
-    << COLOR_DEBUG << " DEBUG " << COLOR_RESET << "|  " << msg << '\n';
+    << COLOR_DEBUG << " DEBUG " << COLOR_RESET << "| " << msg << '\n';
 }
 
 /**
@@ -34,7 +34,7 @@ void Logger::debug(const std::string& msg) {
  */
 void Logger::devel(const std::string& msg) {
   if (msg.length() > 0 && Logger::getMode() & LOG_DEVEL) std::cout
-    << COLOR_DEVEL << " DEVEL " << COLOR_RESET << "|  " << msg << '\n';
+    << COLOR_DEVEL << " DEVEL " << COLOR_RESET << "| " << msg << '\n';
 }
 
 /**
@@ -57,7 +57,7 @@ short Logger::getMode() {
  */
 void Logger::info(const std::string& msg) {
   if (msg.length() > 0 && Logger::getMode() & LOG_INFO) std::cout << COLOR_INFO
-    << "  INFO " << COLOR_RESET << "|  " << msg << '\n';
+    << "  INFO " << COLOR_RESET << "| " << msg << '\n';
 }
 
 /**
@@ -82,6 +82,6 @@ bool Logger::setMode(short m) {
  */
 void Logger::stack(const std::string& func, bool end) {
   if (func.length() > 0 && Logger::getMode() & LOG_STACK) std::cout
-    << COLOR_STACK << " STACK " << COLOR_RESET << '|'
-    << (end == true ? " - " : " + ") << func << ";\n";
+    << COLOR_STACK << " STACK " << COLOR_RESET
+    << (end == true ? "- " : "+ ") << func << ";\n";
 }

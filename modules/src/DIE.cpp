@@ -53,8 +53,11 @@ void DIE::receiveRaw(const std::string& name, void* data) {
   RawEventData* rawEventData = (RawEventData*)data;
   if (rawEventData->d == "DIE") {
     rawEventData->c->send(name + "\n");
+    // Close all Connections (will log this Event instance's Connection after
+    // event completion due to the std::shared_ptr<Connection> in use)
     ConnectionManagement::closeAll();
-    // SocketManagement::closeAll();
+    // Close all Sockets
+    SocketManagement::closeAll();
   }
 
   Logger::stack(__PRETTY_FUNCTION__, true);

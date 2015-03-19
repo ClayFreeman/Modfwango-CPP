@@ -29,6 +29,7 @@
 class Logger {
   private:
     static short mode;
+    static short indent;
     // Prevent this class from being instantiated
     Logger() {}
   public:

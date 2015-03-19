@@ -59,6 +59,11 @@ Socket::Socket(const std::string& addr, int portno): host{addr}, port{portno} {
   }
 }
 
+/**
+ * @brief Destructor
+ *
+ * Closes the Socket and informs via debug log queue
+ */
 Socket::~Socket() {
   if (this->isValid()) {
     Logger::debug("Socket " + this->host + ":" + std::to_string(this->port) +

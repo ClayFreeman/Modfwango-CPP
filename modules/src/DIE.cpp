@@ -54,7 +54,7 @@ void DIE::receiveRaw(const std::string& name, void* data) {
   if (rawEventData->d == "DIE") {
     rawEventData->c->send(name + "\n");
     ConnectionManagement::closeAll();
-    SocketManagement::closeAll();
+    // SocketManagement::closeAll();
   }
 
   Logger::stack(__PRETTY_FUNCTION__, true);

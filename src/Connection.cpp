@@ -170,7 +170,8 @@ std::shared_ptr<FileDescriptor> Connection::getSock() const {
  * @return true if valid, false otherwise
  */
 bool Connection::isValid() const {
-  return fcntl(*this->sockfd, F_GETFD) != -1 || errno != EBADF;
+  return !(this->sockfd == nullptr) ||
+    fcntl(*this->sockfd, F_GETFD) != -1 || errno != EBADF;
 }
 
 /**

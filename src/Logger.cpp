@@ -9,10 +9,36 @@
  */
 
 #include <iostream>
+#include <vector>
+#include <string>
 #include "../include/Logger.hpp"
 
 short Logger::mode = (DEBUG == 1 ? LOG_ALL : LOG_INFO);
 short Logger::indent = 0;
+
+/**
+ * @brief Explode
+ *
+ * Explodes a std::string by a delimiter to a std::vector of std::string
+ *
+ * @param s The std::string to explode
+ * @param d The delimiter to explode the std::string
+ *
+ * @return std::vector of std::string
+ */
+std::vector<std::string> explode(const std::string& s, const std::string& d) {
+  std::size_t cpos = 0, lpos = 0;
+  std::vector<std::string> result;
+
+  for (; (cpos = s.find(d, lpos)) != std::string::npos;
+      lpos = cpos + d.length())
+    // Add each item separated by a delimiter
+    result.push_back(s.substr(lpos, cpos - lpos));
+  // Add the last substr with no delimiter
+  result.push_back(s.substr(lpos));
+
+  return result;
+}
 
 /**
  * @brief Debug

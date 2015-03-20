@@ -12,10 +12,14 @@
 #include <iostream>
 #include <limits.h>
 #include <libgen.h>
+#include <signal.h>
 #include <stdexcept>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 #include "include/ConnectionManagement.hpp"
 #include "include/EventHandling.hpp"
 #include "include/File.hpp"
@@ -23,6 +27,9 @@
 #include "include/ModuleManagement.hpp"
 #include "include/Runtime.hpp"
 #include "include/SocketManagement.hpp"
+#include "include/Utility.hpp"
+
+void signal_handler(int signal);
 
 int main(int argc, char* const argv[]) {
   // Setup the global __PROJECTROOT__ variable (safely)
@@ -91,15 +98,28 @@ int main(int argc, char* const argv[]) {
   }
   sockets.close();
 
+  // Register signal_handler(...) as a callback for SIGINT
+  signal(SIGINT, signal_handler);
+
+  // Loop while there are Connections or Sockets still active and __DIE__ has
+  // not been set
   while ((ConnectionManagement::count() > 0 || SocketManagement::count() > 0) &&
       Runtime::get("__DIE__").length() == 0) {
+    // Stall until there is something to do on a Socket or Connection
     SocketManagement::stall();
+    // Accept any incoming clients (if existent)
     SocketManagement::acceptConnections();
+    // Prune any closed Connections
     ConnectionManagement::pruneConnections();
+    // Loop through all active Connections ...
     for (auto i : ConnectionManagement::getConnections()) {
       try {
+        // and read data in order to ...
         const std::string& data = i->getData();
-        if (data.length() > 0) EventHandling::receiveData(i, data);
+        if (data.length() > 0)
+          // pass each line of data to EventHandling
+          for (auto d : Utility::explode(data, "\n"))
+            EventHandling::receiveData(i, d);
       }
       catch (const std::runtime_error& e) {
         Logger::debug(e.what());
@@ -108,4 +128,18 @@ int main(int argc, char* const argv[]) {
   }
 
   return 0;
+}
+
+/**
+ * @brief Signal Handler
+ *
+ * Callback for signal handling
+ *
+ * @param signal The signal that was received
+ */
+void signal_handler(int signal) {
+  // Mask ^C character
+  std::cout << "\b\b";
+  // Set the __DIE__ constant to trigger a shutdown
+  Runtime::add("__DIE__", std::to_string(signal));
 }

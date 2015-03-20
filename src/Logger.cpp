@@ -25,9 +25,7 @@ short Logger::indent = 0;
  * @param msg The message to print
  */
 void Logger::debug(const std::string& msg) {
-  std::vector<std::string> v{Utility::explode(msg, "\n")};
-
-  for (auto m : v)
+  for (auto m : Utility::explode(msg, "\n"))
     if (m.length() > 0 && Logger::getMode() & LOG_DEBUG) {
       std::cout << COLOR_DEBUG << " DEBUG " << COLOR_RESET;
       for (int i = 0; i < Logger::indent; i++)
@@ -44,9 +42,7 @@ void Logger::debug(const std::string& msg) {
  * @param msg The message to print
  */
 void Logger::devel(const std::string& msg) {
-  std::vector<std::string> v{Utility::explode(msg, "\n")};
-
-  for (auto m : v)
+  for (auto m : Utility::explode(msg, "\n"))
     if (m.length() > 0 && Logger::getMode() & LOG_DEVEL) {
       std::cout << COLOR_DEVEL << " DEVEL " << COLOR_RESET;
       for (int i = 0; i < Logger::indent; i++)
@@ -74,9 +70,7 @@ short Logger::getMode() {
  * @param msg The message to print
  */
 void Logger::info(const std::string& msg) {
-  std::vector<std::string> v{Utility::explode(msg, "\n")};
-
-  for (auto m : v)
+  for (auto m : Utility::explode(msg, "\n"))
     if (m.length() > 0 && Logger::getMode() & LOG_INFO) {
       std::cout << COLOR_INFO << "  INFO " << COLOR_RESET;
       for (int i = 0; i < Logger::indent; i++)

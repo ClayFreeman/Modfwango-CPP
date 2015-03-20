@@ -8,18 +8,8 @@
  * @date       January 23, 2015
  */
 
-#include <fstream>
 #include <iostream>
-#include <limits.h>
-#include <libgen.h>
-#include <signal.h>
-#include <stdexcept>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
 #include "include/ConnectionManagement.hpp"
 #include "include/EventHandling.hpp"
 #include "include/File.hpp"
@@ -29,51 +19,31 @@
 #include "include/SocketManagement.hpp"
 #include "include/Utility.hpp"
 
-// Declare signal_handler prototype
+// Declare helper function prototypes
+void load_config();
+void loop();
+void prepare_environment(int argc, char* const argv[]);
 void signal_handler(int signal);
 
 int main(int argc, char* const argv[]) {
-  // Setup the global __PROJECTROOT__ variable (safely)
-  if (argc > 0) {
-    // Allocate storage for realpath(...)
-    char* tmp1 = (char*)calloc(PATH_MAX, sizeof(char));
-    realpath(argv[0], tmp1);
-    // Create a pointer for the static C-String provided by dirname(...)
-    char* tmp2 = dirname(tmp1);
-    // Create a copy of tmp2
-    char* tmp3 = (char*)calloc(strlen(tmp2) + 1, sizeof(char));
-    memcpy((char*)tmp3, tmp2, strlen(tmp2));
-    // Free the first temporary variable
-    free(tmp1);
-    // Store the path in the Runtime class
-    if (!Runtime::add("__PROJECTROOT__", tmp3)) {
-      // Free the third temporary variable
-      free(tmp3);
-      throw std::logic_error{
-        "Could not store __PROJECTROOT__ in Runtime instance"
-      };
-    }
-    // Free the third temporary variable
-    free(tmp3);
-  }
-
-  // Prepare environment
-  Runtime::add("__MODFWANGOVERSION__", "1.00");
-  Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
-  if (argc > 1) Logger::setMode(atoi(argv[1]));
-  else Logger::setMode(LOG_ALL);
+  // Prepare runtime environment variables
+  prepare_environment(argc, argv);
 
   // Welcome via console
   Logger::info("Welcome to Modfwango!");
   Logger::info("You're running Modfwango v" +
     Runtime::get("__MODFWANGOVERSION__"));
 
-  // Create directories/files
-  mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),
-    S_IRWXU | S_IRWXG | S_IRWXO);
-  File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
-  File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
+  // Load configuration
+  load_config();
 
+  // Run main loop
+  loop();
+
+  return 0;
+}
+
+void load_config() {
   // Load Modules
   for (auto module : Utility::explode(File::getContent(
       Runtime::get("__PROJECTROOT__") + "/conf/modules.conf"), "\n")) {
@@ -93,10 +63,9 @@ int main(int argc, char* const argv[]) {
       SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
     }
   }
+}
 
-  // Register signal_handler(...) as a callback for SIGINT
-  signal(SIGINT, signal_handler);
-
+void loop() {
   // Loop while there are Connections or Sockets still active and __DIE__ has
   // not been set
   while ((ConnectionManagement::count() > 0 || SocketManagement::count() > 0) &&
@@ -122,8 +91,32 @@ int main(int argc, char* const argv[]) {
       }
     }
   }
+}
 
-  return 0;
+void prepare_environment(int argc, char* const argv[]) {
+  // Setup the global __PROJECTROOT__ variable (safely)
+  if (argc < 1 || !Runtime::add("__PROJECTROOT__", File::directory(
+      File::realPath(argv[0])))) {
+    // Free the third temporary variable
+    throw std::logic_error{
+      "Could not store __PROJECTROOT__ in Runtime instance"
+    };
+  }
+
+  // Prepare environment
+  Runtime::add("__MODFWANGOVERSION__", "1.00");
+  Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
+  if (argc > 1) Logger::setMode(atoi(argv[1]));
+  else Logger::setMode(LOG_ALL);
+
+  // Create directories/files
+  mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),
+    S_IRWXU | S_IRWXG | S_IRWXO);
+  File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
+  File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
+
+  // Register signal_handler(...) as a callback for SIGINT
+  signal(SIGINT, signal_handler);
 }
 
 /**

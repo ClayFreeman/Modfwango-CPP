@@ -83,13 +83,13 @@ int main(int argc, char* const argv[]) {
   // Load Sockets
   for (auto socket : Utility::explode(File::getContent(
       Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
-    if (socket.length() > 0 && socket.find(":") != std::string::npos) {
+    if (socket.length() > 0) {
+      std::vector<std::string> v{Utility::explode(socket, ":")};
       // We don't support SSL yet ... :(
-      if (socket.find("+") != std::string::npos)
-        socket.erase(socket.find("+"), 1);
+      if (v[1].substr(0, 1) == "+")
+        v[1].erase(0, 1);
       // Create the Socket
-      SocketManagement::newSocket(socket.substr(0, socket.find(":")),
-        atoi(socket.substr(socket.find(":") + 1).c_str()));
+      SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
     }
   }
 

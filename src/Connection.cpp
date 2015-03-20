@@ -8,10 +8,8 @@
  * @date       March 12, 2015
  */
 
-#include <algorithm>
 #include <ctype.h>
 #include <errno.h>
-#include <functional>
 #include <locale>
 #include <memory>
 #include <stdexcept>
@@ -23,6 +21,7 @@
 #include "../include/Connection.hpp"
 #include "../include/FileDescriptor.hpp"
 #include "../include/Logger.hpp"
+#include "../include/Utility.hpp"
 
 /**
  * @brief Destructor
@@ -31,49 +30,6 @@
  */
 Connection::~Connection() {
   this->reset();
-}
-
-/**
- * @brief Left Trim
- *
- * Trims whitespace from the left side of the provided std::string
- *
- * @param[out] s The std::string to trim
- *
- * @return The modified std::string
- */
-std::string& Connection::ltrim(std::string& s) const {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(
-    std::ptr_fun<int, int>(std::isspace))));
-  return s;
-}
-
-/**
- * @brief Right Trim
- *
- * Trims whitespace from the right side of the provided std::string
- *
- * @param[out] s The std::string to trim
- *
- * @return The modified std::string
- */
-std::string& Connection::rtrim(std::string& s) const {
-  s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(
-    std::isspace))).base(), s.end());
-  return s;
-}
-
-/**
- * @brief Trim
- *
- * Trims whitespace from the ends of the provided std::string
- *
- * @param[out] s The std::string to trim
- *
- * @return The modified std::string
- */
-std::string& Connection::trim(std::string& s) const {
-  return this->ltrim(this->rtrim(s));
 }
 
 /**
@@ -111,7 +67,7 @@ std::string Connection::getData() {
       // Free the storage for the buffer ...
       free(buffer);
       // and trim the std::string
-      trim(retVal);
+      Utility::trim(retVal);
 
       // If there was 0 bytes of data to read ...
       if (count < 1) {
@@ -120,8 +76,10 @@ std::string Connection::getData() {
         throw std::runtime_error{"Connection reset by peer " + this->host +
           ":" + std::to_string(this->port)};
       }
-      else
-        Logger::debug("Received data:\n" + retVal);
+      else {
+        Logger::debug("Received data:");
+        Logger::debug(retVal);
+      }
     }
   }
 

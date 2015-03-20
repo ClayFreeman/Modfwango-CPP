@@ -28,7 +28,7 @@ class Module {
     // Each Module needs a getter for its name
     const std::string& getName() const;
     // Each Module needs an isInstantiated method
-    virtual bool isInstantiated();
+    virtual bool isInstantiated() = 0;
 };
 
 #endif

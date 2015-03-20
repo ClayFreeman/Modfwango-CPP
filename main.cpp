@@ -101,7 +101,9 @@ int main(int argc, char* const argv[]) {
         const std::string& data = i->getData();
         if (data.length() > 0) EventHandling::receiveData(i, data);
       }
-      catch (const std::runtime_error&) {}
+      catch (const std::runtime_error& e) {
+        Logger::debug(e.what());
+      }
     }
   }
 

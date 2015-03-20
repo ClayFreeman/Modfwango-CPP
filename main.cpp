@@ -29,6 +29,7 @@
 #include "include/SocketManagement.hpp"
 #include "include/Utility.hpp"
 
+// Declare signal_handler prototype
 void signal_handler(int signal);
 
 int main(int argc, char* const argv[]) {

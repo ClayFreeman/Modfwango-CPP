@@ -9,6 +9,7 @@
  */
 
 #include <iostream>
+#include <signal.h>
 #include <sys/stat.h>
 #include "include/ConnectionManagement.hpp"
 #include "include/EventHandling.hpp"

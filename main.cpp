@@ -73,30 +73,25 @@ int main(int argc, char* const argv[]) {
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
 
-  // Load modules
-  std::string module;
-  std::ifstream modules;
-  modules.open(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
-  while (modules.good() && std::getline(modules, module)) {
-    ModuleManagement::loadModule(module);
-    modules.peek();
+  // Load Modules
+  for (auto module : Utility::explode(File::getContent(
+      Runtime::get("__PROJECTROOT__") + "/conf/modules.conf"), "\n")) {
+    if (module.length() > 0)
+      ModuleManagement::loadModule(module);
   }
-  modules.close();
 
-  // Load sockets
-  std::string socket;
-  std::ifstream sockets;
-  sockets.open(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
-  while (sockets.good() && std::getline(sockets, socket)) {
-    if (socket.find(":") != std::string::npos) {
+  // Load Sockets
+  for (auto socket : Utility::explode(File::getContent(
+      Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
+    if (socket.length() > 0 && socket.find(":") != std::string::npos) {
+      // We don't support SSL yet ... :(
       if (socket.find("+") != std::string::npos)
-        socket.erase(socket.find("+"));
+        socket.erase(socket.find("+"), 1);
+      // Create the Socket
       SocketManagement::newSocket(socket.substr(0, socket.find(":")),
         atoi(socket.substr(socket.find(":") + 1).c_str()));
-      sockets.peek();
     }
   }
-  sockets.close();
 
   // Register signal_handler(...) as a callback for SIGINT
   signal(SIGINT, signal_handler);

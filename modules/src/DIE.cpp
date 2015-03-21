@@ -53,7 +53,7 @@ void DIE::receiveRaw(const std::string& name, void* data) {
 
   RawEventData* rawEventData = (RawEventData*)data;
   Logger::info(std::to_string(rawEventData->d.length()));
-  for (auto i : rawEventData->d.c_str())
+  for (auto i : rawEventData->d)
     Logger::info(std::to_string(static_cast<int>(i)));
   if (rawEventData->d == "DIE") {
     Logger::info(name + ": Shutting down ...");

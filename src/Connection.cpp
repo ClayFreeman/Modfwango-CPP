@@ -76,10 +76,6 @@ std::string Connection::getData() {
         throw std::runtime_error{"Connection reset by peer " + this->host +
           ":" + std::to_string(this->port)};
       }
-      else {
-        Logger::debug("Received data:");
-        Logger::debug(retVal);
-      }
     }
   }
 

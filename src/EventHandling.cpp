@@ -84,6 +84,7 @@ bool EventHandling::destroyEvent(const std::string& name) {
  */
 void EventHandling::receiveData(const std::shared_ptr<Connection>& c,
     const std::string& data) {
+  Logger::debug("Received data:\n" + data);
   for (auto i : EventHandling::events) {
     i.second->call(c, data);
   }

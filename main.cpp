@@ -95,6 +95,9 @@ void loop() {
 }
 
 void prepare_environment(int argc, char* const argv[]) {
+  // Register signal_handler(...) as a callback for SIGINT
+  signal(SIGINT, signal_handler);
+
   // Setup the global __PROJECTROOT__ variable (safely)
   if (argc < 1 || !Runtime::add("__PROJECTROOT__", File::directory(
       File::realPath(argv[0])))) {
@@ -115,9 +118,6 @@ void prepare_environment(int argc, char* const argv[]) {
     S_IRWXU | S_IRWXG | S_IRWXO);
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
-
-  // Register signal_handler(...) as a callback for SIGINT
-  signal(SIGINT, signal_handler);
 }
 
 /**

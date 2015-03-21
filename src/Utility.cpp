@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <functional>
 #include <string>
 #include <vector>
 #include "../include/Utility.hpp"
@@ -48,7 +49,8 @@ std::vector<std::string> Utility::explode(const std::string& s,
  * @return The modified std::string&
  */
 std::string& Utility::ltrim(std::string& s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::isgraph));
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+    std::ptr_fun<int, int>(std::isgraph)));
   return s;
 }
 
@@ -62,7 +64,8 @@ std::string& Utility::ltrim(std::string& s) {
  * @return The modified std::string&
  */
 std::string& Utility::rtrim(std::string& s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(), std::isgraph).base(), s.end());
+  s.erase(std::find_if(s.rbegin(), s.rend(),
+    std::ptr_fun<int, int>(std::isgraph)).base(), s.end());
   return s;
 }
 

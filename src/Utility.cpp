@@ -9,7 +9,6 @@
  */
 
 #include <algorithm>
-#include <functional>
 #include <string>
 #include <vector>
 #include "../include/Utility.hpp"
@@ -42,41 +41,39 @@ std::vector<std::string> Utility::explode(const std::string& s,
 /**
  * @brief Left Trim
  *
- * Trims whitespace from the left side of the provided std::string
+ * Trims whitespace from the left end of the provided std::string
  *
  * @param[out] s The std::string to trim
  *
- * @return The modified std::string
+ * @return The modified std::string&
  */
 std::string& Utility::ltrim(std::string& s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(
-    std::ptr_fun<int, int>(std::isspace))));
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::isgraph));
   return s;
 }
 
 /**
  * @brief Right Trim
  *
- * Trims whitespace from the right side of the provided std::string
+ * Trims whitespace from the right end of the provided std::string
  *
  * @param[out] s The std::string to trim
  *
- * @return The modified std::string
+ * @return The modified std::string&
  */
 std::string& Utility::rtrim(std::string& s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(
-    std::isspace))).base(), s.end());
+  s.erase(std::find_if(s.rbegin(), s.rend(), std::isgraph).base(), s.end());
   return s;
 }
 
 /**
  * @brief Trim
  *
- * Trims whitespace from the ends of the provided std::string
+ * Trims whitespace from both ends of the provided std::string
  *
  * @param[out] s The std::string to trim
  *
- * @return The modified std::string
+ * @return The modified std::string&
  */
 std::string& Utility::trim(std::string& s) {
   return Utility::ltrim(Utility::rtrim(s));

@@ -85,7 +85,7 @@ void loop() {
         if (data.length() > 0)
           // pass each line of data to EventHandling
           for (auto d : Utility::explode(data, "\n"))
-            EventHandling::receiveData(i, d);
+            EventHandling::receiveData(i, Utility::trim(d));
       }
       catch (const std::runtime_error& e) {
         Logger::debug(e.what());

@@ -52,10 +52,12 @@ void DIE::receiveRaw(const std::string& name, void* data) {
   Logger::stack(__PRETTY_FUNCTION__);
 
   RawEventData* rawEventData = (RawEventData*)data;
+  if (rawEventData->d.find("DIE"))
+    Logger::info(rawEventData->d);
   if (rawEventData->d == "DIE") {
-    Logger::info(name + ": Shutting down...");
+    Logger::info(name + ": Shutting down ...");
     for (auto i : ConnectionManagement::getConnections())
-      i->send(name + ": Shutting down...\n");
+      i->send(name + ": Shutting down ...\n");
     Runtime::add("__DIE__", "1");
   }
 

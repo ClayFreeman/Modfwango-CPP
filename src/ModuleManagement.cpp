@@ -92,12 +92,13 @@ std::shared_ptr<Module> ModuleManagement::getModuleByName(
  * @return true on success, false otherwise
  */
 bool ModuleManagement::loadModule(const std::string& name) {
+  std::string path = "modules/src/" + name + ".so";
   bool status = false;
-  Logger::debug("Attempting to load module \"" + name + "\" ...");
+  Logger::debug("Attempting to load module at path \"" + path + "\" ...");
   std::string e;
-  if (!ModuleManagement::getModuleByName(ModuleManagement::getBasename(name))) {
+  if (!ModuleManagement::getModuleByName(ModuleManagement::getBasename(path))) {
     // Attempt to load the requested shared object
-    void* obj = dlopen(name.c_str(), RTLD_NOW);
+    void* obj = dlopen(path.c_str(), RTLD_NOW);
     if (obj != NULL) {
       // Clear any errors before continuing
       dlerror();
@@ -109,7 +110,7 @@ bool ModuleManagement::loadModule(const std::string& name) {
         // Fetch an instance of the module
         Module* module = m();
         if (module != nullptr &&
-            module->getName() == ModuleManagement::getBasename(name)) {
+            module->getName() == ModuleManagement::getBasename(path)) {
           // Add the module to the internal array
           ModuleManagement::modules[module->getName()] =
             std::shared_ptr<ModuleInstance>{
@@ -122,20 +123,19 @@ bool ModuleManagement::loadModule(const std::string& name) {
           if (module->isInstantiated() == true) {
             // Module loaded successfully
             status = true;
-            Logger::info("Loaded Module \"" + name
-              + "\"");
+            Logger::info("Loaded Module \"" + module->getName() + "\"");
           }
           else {
-            // Unload the module
-            ModuleManagement::unloadModule(ModuleManagement::getBasename(name));
-
             Logger::debug("Unable to load module \""
-              + ModuleManagement::getBasename(name) + "\"");
+              + ModuleManagement::getBasename(module->getName()) + "\"");
 
-            e += "Module refused to load during \"";
-            e += ModuleManagement::getBasename(name);
-            e += "::isInstantiated()\"";
+            e = "Module refused to load during \"" + module->getName() +
+              "::isInstantiated()\"";
             Logger::debug(e);
+
+            // Unload the module
+            ModuleManagement::unloadModule(module->getName());
+
             throw std::logic_error(e);
           }
         }
@@ -143,12 +143,10 @@ bool ModuleManagement::loadModule(const std::string& name) {
           if (module != nullptr) delete module;
           dlclose(obj);
 
-          Logger::debug("Unable to load module \""
-            + ModuleManagement::getBasename(name) + "\"");
+          Logger::debug("Unable to load module at path \"" + path + "\"");
 
-          e += "Internal logic error in module \"";
-          e += ModuleManagement::getBasename(name);
-          e += "\" during _load()";
+          e = "Internal logic error in module at path \"" + path +
+            "\" during _load()";
           Logger::debug(e);
           throw std::logic_error(e);
         }
@@ -156,11 +154,10 @@ bool ModuleManagement::loadModule(const std::string& name) {
       else {
         dlclose(obj);
 
-        Logger::debug("Unable to load module \""
-          + ModuleManagement::getBasename(name) + "\"");
+        Logger::debug("Unable to load module at path \"" + path + "\"");
 
         // Handle errors fetching a pointer
-        e += err;
+        e = err;
         Logger::debug(e);
         throw std::runtime_error(e);
       }
@@ -169,23 +166,12 @@ bool ModuleManagement::loadModule(const std::string& name) {
       // Handle miscellaneous errors
       const char* err = dlerror();
 
-      Logger::debug("Unable to load module \""
-        + ModuleManagement::getBasename(name) + "\"");
+      Logger::debug("Unable to load module at path \"" + path + "\"");
 
-      e += err;
+      e = err;
       Logger::debug(e);
       throw std::runtime_error(e);
     }
-  }
-  else {
-    Logger::debug("Unable to load module \""
-      + ModuleManagement::getBasename(name) + "\"");
-
-    e += "Module with name \"";
-    e += ModuleManagement::getBasename(name);
-    e += "\" is already loaded";
-    Logger::debug(e);
-    throw std::runtime_error(e);
   }
   return status;
 }

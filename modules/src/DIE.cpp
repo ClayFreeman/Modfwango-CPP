@@ -16,6 +16,7 @@
 #include "../../include/EventHandling.hpp"
 #include "../../include/Logger.hpp"
 #include "../../include/Module.hpp"
+#include "../../include/ModuleManagement.hpp"
 #include "../../include/Runtime.hpp"
 #include "../../include/SocketManagement.hpp"
 
@@ -29,12 +30,18 @@
  */
 bool DIE::isInstantiated() {
   Logger::stack(__PRETTY_FUNCTION__);
+  bool status = true;
 
-  EventHandling::registerForEvent("rawEvent", this->getName(),
+  std::vector<std::string> depend{"RawEvent"};
+  for (auto i : depend) {
+    ModuleManagement::loadModule(i);
+  }
+
+  status &= EventHandling::registerForEvent("rawEvent", this->getName(),
     &DIE::receiveRaw);
 
   Logger::stack(__PRETTY_FUNCTION__, true);
-  return true;
+  return status;
 }
 
 /**

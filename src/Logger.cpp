@@ -14,7 +14,7 @@
 #include "../include/Logger.hpp"
 #include "../include/Utility.hpp"
 
-short Logger::mode = (DEBUG == 1 ? LOG_ALL : LOG_INFO);
+short Logger::mode = (DEBUG == 1 ? LOGLEVEL_DEVEL : LOGLEVEL_INFO);
 short Logger::indent = 0;
 
 /**
@@ -89,7 +89,8 @@ void Logger::info(const std::string& msg) {
  * @return true if valid, false otherwise
  */
 bool Logger::setMode(short m) {
-  return (m >= LOG_SILENT && m <= LOG_ALL) && (Logger::mode = m) >= LOG_SILENT;
+  return (m >= LOGLEVEL_SILENT && m <= LOGLEVEL_DEVEL) &&
+    (Logger::mode = m) >= LOGLEVEL_SILENT;
 }
 
 /**

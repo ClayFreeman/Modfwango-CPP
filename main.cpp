@@ -8,9 +8,12 @@
  * @date       January 23, 2015
  */
 
+#include <errno.h>
+#include <fcntl.h>
 #include <iostream>
 #include <signal.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "include/ConnectionManagement.hpp"
 #include "include/EventHandling.hpp"
 #include "include/File.hpp"
@@ -21,6 +24,7 @@
 #include "include/Utility.hpp"
 
 // Declare helper function prototypes
+void background();
 void load_config();
 void loop();
 void prepare_environment(int argc, char* const argv[]);
@@ -38,10 +42,45 @@ int main(int argc, char* const argv[]) {
   // Load configuration
   load_config();
 
+  // Background the current process if in daemon mode
+  if (Logger::getMode() == LOGLEVEL_SILENT) background();
+
   // Run main loop
   loop();
 
   return 0;
+}
+
+/**
+ * @brief Background
+ *
+ * Puts the current running process in the background as a daemon
+ */
+void background() {
+  // Fork and terminate parent process
+  if (fork() > 0)
+    _exit(0);
+
+  // Create a new session
+  setsid();
+
+  // Fork and terminate parent process
+  if (fork() > 0)
+    _exit(0);
+
+  // Set the current working directory to the project root
+  chdir(Runtime::get("__PROJECTROOT__").c_str());
+
+  // Set the user mask to zero
+  umask(0);
+
+  // Open standard fds to /dev/null
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
+  open("/dev/null", O_RDONLY);
+  open("/dev/null", O_WRONLY);
+  open("/dev/null", O_RDWR);
 }
 
 void load_config() {
@@ -110,14 +149,38 @@ void prepare_environment(int argc, char* const argv[]) {
   // Prepare environment
   Runtime::add("__MODFWANGOVERSION__", "1.00");
   Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
-  if (argc > 1) Logger::setMode(atoi(argv[1]));
-  else Logger::setMode(LOG_ALL);
 
   // Create directories/files
   mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),
     S_IRWXU | S_IRWXG | S_IRWXO);
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
+
+  // Enumerate log levels via array
+  const int MODESIZE = 5;
+  short modes[MODESIZE] = {
+    LOGLEVEL_SILENT,
+    LOGLEVEL_INFO,
+    LOGLEVEL_STACK,
+    LOGLEVEL_DEBUG,
+    LOGLEVEL_DEVEL
+  };
+
+  if (argc > 1) {
+    // Determine log level from argv
+    int level = atoi(argv[1]);
+    if (level >= 0 && level < 5)
+      Logger::setMode(modes[level]);
+  }
+  else if (File::exists(Runtime::get("__PROJECTROOT__") +
+      "/conf/loglevel.conf")) {
+    int level = atoi(File::getContent(Runtime::get("__PROJECTROOT__") +
+      "/conf/loglevel.conf").c_str());
+    if (level >= 0 && level < 5)
+      Logger::setMode(modes[level]);
+  }
+
+  // Check existing PID, etc
 }
 
 /**

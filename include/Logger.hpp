@@ -12,12 +12,18 @@
 #define _LOGGER_H
 
 // Add these numbers to combine modes
-#define LOG_SILENT 0  // [0x0000] Silent execution
-#define LOG_INFO   1  // [0x0001] Informational output
-#define LOG_STACK  2  // [0x0010] Shows entrance and exit of functions
-#define LOG_DEBUG  4  // [0x0100] Output related to code workflow
-#define LOG_DEVEL  8  // [0x1000] Output for data/resource debugging
-#define LOG_ALL    15 // [0x1111] Show all output
+#define LOG_SILENT      0  // [0x0000] Silent execution
+#define LOG_INFO        1  // [0x0001] Informational output
+#define LOG_STACK       2  // [0x0010] Shows entrance and exit of functions
+#define LOG_DEBUG       4  // [0x0100] Output related to code workflow
+#define LOG_DEVEL       8  // [0x1000] Output for data/resource debugging
+
+// Define ceiling log levels
+#define LOGLEVEL_SILENT 0  // [0x0000] Show nothing
+#define LOGLEVEL_INFO   1  // [0x0001] Show info
+#define LOGLEVEL_STACK  3  // [0x0011] Show stack and info
+#define LOGLEVEL_DEBUG  7  // [0x0111] Show debug, stack, and info
+#define LOGLEVEL_DEVEL  15 // [0x1111] Show all output
 
 // Used internally for console color codes
 #define COLOR_INFO  "\x1b[32;01m" // Green

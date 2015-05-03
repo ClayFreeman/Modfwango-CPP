@@ -13,6 +13,9 @@
 #include <iostream>
 #include <regex>
 #include <signal.h>
+#ifdef __linux__
+#include <sys/prctl.h>
+#endif
 #include <sys/stat.h>
 #include <unistd.h>
 #include "include/ConnectionManagement.hpp"
@@ -216,9 +219,26 @@ void prepare_environment(int argc, char* const argv[]) {
   if (argc > 1 && isalpha(*argv[1])) {
     std::string s;
     std::transform(argv[1], argv[1] + strlen(argv[1]), s.begin(), tolower);
-    if (s == "prelaunch")
+    if (s == "prelaunch") {
+      Logger::info("Exiting early ...");
       exit(0);
+    }
   }
+
+  // Set process title
+  std::string title{"modfwango"};
+  if (File::isFile(Runtime::get("__PROJECTROOT__") + "/conf/name.conf")) {
+    const std::string tmp{File::getContent(Runtime::get("__PROJECTROOT__") +
+      "/conf/name.conf")};
+    if (std::regex_match(tmp, std::regex("^[a-zA-Z]+[a-zA-Z0-9_-]*$")))
+      title = tmp;
+  }
+  #ifdef __linux__
+  prctl(PR_SET_NAME, title.c_str(), 0, 0, 0);
+  #endif
+
+  // Check for process conflicts
+  if (File::isFile(Runtime::get("__PROJECTROOT__") + "/data/")) {;}
 }
 
 /**

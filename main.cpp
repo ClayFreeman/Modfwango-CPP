@@ -34,9 +34,6 @@ void prepare_runtime();
 void start_runtime();
 
 int main(int argc, char* const argv[]) {
-  // Welcome the user
-  Logger::info("Welcome to Modfwango!");
-
   // Prepare runtime environment variables
   prepare_environment(argc, argv);
 
@@ -104,7 +101,8 @@ void background() {
 // void loop() {
 //   // Loop while there are Connections or Sockets still active and __DIE__ has
 //   // not been set
-//   while ((ConnectionManagement::count() > 0 || SocketManagement::count() > 0) &&
+//   while ((ConnectionManagement::count() > 0 ||
+//       SocketManagement::count() > 0) &&
 //       Runtime::get("__DIE__").length() == 0) {
 //     // Stall until there is something to do on a Socket or Connection
 //     SocketManagement::stall();
@@ -177,15 +175,16 @@ void prepare_environment(int argc, char* const argv[]) {
   // Change directory to the project root
   chdir(Runtime::get("__PROJECTROOT__").c_str());
 
-  // Fetch loglevel from either CLI or config file
-  short loglevel = -1;
+  // TODO:  Determine if setting log level should be postponed until runtime
+  // Fetch log level from either CLI or config file
+  short level = -1;
   if (argc > 1)
-    loglevel = atoi(argv[1]);
+    level = atoi(argv[1]);
   else {
     const std::string loglevel_conf{Runtime::get("__PROJECTROOT__") +
       "/conf/loglevel.conf"};
     if (File::isFile(loglevel_conf))
-      loglevel = atoi(File::getContent(loglevel_conf).c_str());
+      level = atoi(File::getContent(loglevel_conf).c_str());
   }
 
   // Setup an array of possible log levels
@@ -199,7 +198,7 @@ void prepare_environment(int argc, char* const argv[]) {
   };
 
   // Set the requested log level (contrary to default if valid)
-  if (loglevel >= 0 && loglevel < MODESIZE) Logger::setMode(modes[loglevel]);
+  if (level >= 0 && level < MODESIZE) Logger::setModeWait(modes[level]);
 
   // Create mandatory directories/files
   const std::string dirs[] = {
@@ -253,7 +252,7 @@ void prepare_environment(int argc, char* const argv[]) {
   }
   Runtime::add("__NAME__", "modfwango");
 
-  // Assign process title
+  // Assign "process" title
   #ifdef __linux__
   prctl(PR_SET_NAME, Runtime::get("__NAME__").c_str(), 0, 0, 0);
   #endif

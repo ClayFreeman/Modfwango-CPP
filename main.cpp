@@ -198,7 +198,7 @@ void prepare_environment(int argc, char* const argv[]) {
   };
 
   // Set the requested log level (contrary to default if valid)
-  if (level >= 0 && level < MODESIZE) Logger::setModeWait(modes[level]);
+  if (level >= 0 && level < MODESIZE) Logger::setMode(modes[level]);
 
   // Create mandatory directories/files
   const std::string dirs[] = {

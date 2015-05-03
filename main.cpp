@@ -37,6 +37,9 @@ int main(int argc, char* const argv[]) {
   // Prepare runtime environment variables
   prepare_environment(argc, argv);
 
+  // Sleep for 10 seconds for testing
+  sleep(10);
+
   // // Welcome via console
   // Logger::info("Welcome to Modfwango!");
   // Logger::info("You're running Modfwango v" +
@@ -225,20 +228,25 @@ void prepare_environment(int argc, char* const argv[]) {
     }
   }
 
-  // Set process title
-  std::string title{"modfwango"};
+  // Load process title from file, or choose default "modfwango"
   if (File::isFile(Runtime::get("__PROJECTROOT__") + "/conf/name.conf")) {
     const std::string tmp{File::getContent(Runtime::get("__PROJECTROOT__") +
       "/conf/name.conf")};
     if (std::regex_match(tmp, std::regex("^[a-zA-Z]+[a-zA-Z0-9_-]*$")))
-      title = tmp;
+      Runtime::add("__NAME__", tmp);
   }
+  Runtime::add("__NAME__", "modfwango");
+
+  // Assign process title
   #ifdef __linux__
-  prctl(PR_SET_NAME, title.c_str(), 0, 0, 0);
+  prctl(PR_SET_NAME, Runtime::get("__NAME__").c_str(), 0, 0, 0);
   #endif
 
   // Check for process conflicts
-  if (File::isFile(Runtime::get("__PROJECTROOT__") + "/data/")) {;}
+  if (File::isFile(Runtime::get("__PROJECTROOT__") + "/data/" +
+      Runtime::get("__NAME__") + ".pid")) {
+    //
+  }
 }
 
 /**

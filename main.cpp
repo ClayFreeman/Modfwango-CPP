@@ -159,6 +159,7 @@ int prepare_environment(int argc, char* const argv[]) {
     Runtime::get("__MODFWANGOROOT__")));
 
   // Exit if theoretical and actual __PROJECTROOT__ differ
+  Logger::devel("Checking validity of __PROJECTROOT__ ...");
   const std::string theoretical_root = File::realPath(File::directory(argv[0]));
   if (Runtime::get("__PROJECTROOT__") != theoretical_root) {
     Logger::info("__PROJECTROOT__ does not match the expected directory \"" +

@@ -173,18 +173,26 @@ void prepare_environment(int argc, char* const argv[]) {
   chdir(Runtime::get("__PROJECTROOT__").c_str());
 
   // Fetch loglevel from either CLI or config file
-  int loglevel = -1;
+  short loglevel = -1;
   if (argc > 1)
     loglevel = atoi(argv[1]);
   else {
     const std::string loglevel_conf{Runtime::get("__PROJECTROOT__") +
       "/conf/loglevel.conf"};
     if (File::isFile(loglevel_conf))
-      loglevel = atoi(File::getContent(loglevel_conf));
+      loglevel = atoi(File::getContent(loglevel_conf).c_str());
   }
 
   // Set the log level (contrary to default if valid)
-  Logger::setLevel(loglevel);
+  const int MODESIZE = 5;
+  short modes[MODESIZE] = {
+    LOGLEVEL_SILENT,
+    LOGLEVEL_INFO,
+    LOGLEVEL_STACK,
+    LOGLEVEL_DEBUG,
+    LOGLEVEL_DEVEL
+  };
+  Logger::setMode(modes[loglevel]);
 
   // Create directories/files
   mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),
@@ -202,7 +210,7 @@ void prepare_environment(int argc, char* const argv[]) {
     Logger::info("WARNING:  No modules will be loaded.");
 
   // Check for early exit request
-  if (argc > 1 && isalpha(argv[1])) {
+  if (argc > 1 && isalpha(*argv[1])) {
     std::string s;
     std::transform(argv[1], argv[1] + strlen(argv[1]), s.begin(), tolower);
     if (s == "prelaunch")

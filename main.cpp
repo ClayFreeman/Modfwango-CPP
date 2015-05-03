@@ -132,36 +132,41 @@ void background() {
 
 int prepare_environment(int argc, char* const argv[]) {
   // Record the timestamp that Modfwango was started
+  Logger::devel("Recording __STARTTIME__ using Unix epoch ...");
   Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
 
-  if (argc > 0 && File::isFile(File::realPath(argv[0])) &&
-      File::executable(File::realPath(argv[0])))
+  Logger::devel("Attempting to find executable path from argv[0] ...");
+  const std::string exe{File::realPath(argv[0])};
+  if (argc > 0 && File::isFile(exe) && File::executable(exe))
     // Record the full path to the executable
-    Runtime::add("__EXECUTABLE__", File::realPath(argv[0]));
+    Logger::devel("Found executable path from argv[0]");
+    Runtime::add("__EXECUTABLE__", exe);
   else {
     Logger::info("Could not determine executable path from argv[0]");
     exit(-1);
   }
 
   // Declare the Modfwango root, which is the parent directory of the executable
+  Logger::devel("Calculating __MODFWANGOROOT__ from __EXECUTABLE__ ...");
   Runtime::add("__MODFWANGOROOT__", File::directory(
     Runtime::get("__EXECUTABLE__")));
 
   // Declare the project root, which should always be the parent directory of
   // __MODFWANGOROOT__
+  Logger::devel("Calculating __PROJECTROOT__ from __MODFWANGOROOT__ ...");
   Runtime::add("__PROJECTROOT__", File::directory(
     Runtime::get("__MODFWANGOROOT__")));
 
   // Exit if theoretical and actual __PROJECTROOT__ differ
-  if (Runtime::get("__PROJECTROOT__") !=
-      File::realPath(File::directory(argv[0]))) {
+  const std::string theoretical_root = File::realPath(File::directory(argv[0]));
+  if (Runtime::get("__PROJECTROOT__") != theoretical_root) {
     Logger::info("__PROJECTROOT__ does not match the expected directory \"" +
-      File::realPath(File::directory(argv[0])) + "\" - Is Modfwango being " +
-      "launched directly?");
+      theoretical_root + "\" - Is Modfwango being launched directly?");
     exit(-2);
   }
 
   // Exit if project & Modfwango roots match
+  Logger::devel("Checking if __MODFWANGOROOT__ and __PROJECTROOT__ match ...");
   if (Runtime::get("__MODFWANGOROOT__") == Runtime::get("__PROJECTROOT__")) {
     Logger::info("__MODFWANGOROOT__ and __PROJECTROOT__ cannot match (\"" +
       Runtime::get("__MODFWANGOROOT__") + "\")");
@@ -169,6 +174,7 @@ int prepare_environment(int argc, char* const argv[]) {
   }
 
   // Verify both project & Modfwango roots as safe
+  Logger::devel("Checking safety of __PROJECTROOT__ and __MODFWANGOROOT__ ...");
   std::string path_regex{"^[a-zA-Z0-9\\/._-]+$"};
   if (!std::regex_match(Runtime::get("__PROJECTROOT__"),
       std::regex(path_regex))) {
@@ -184,24 +190,30 @@ int prepare_environment(int argc, char* const argv[]) {
   }
 
   // Change directory to the project root
+  Logger::devel("Changing the working directory to __PROJECTROOT__ ...");
   chdir(Runtime::get("__PROJECTROOT__").c_str());
 
   // Fetch log level from either CLI or config file, otherwise use default
+  Logger::devel("Attempt to determine user-defined log level ...");
   short loglevel = Logger::getMode();
   if (argc > 1) {
     short tmp = atoi(argv[1]);
-    if (tmp >= 0 && tmp < LOGLEVELSIZE)
+    if (tmp >= 0 && tmp < LOGLEVELSIZE) {
       // If the requested log level is safe, use it
+      Logger::devel("Using log level provided from command-line argument");
       loglevel = LogLevels[tmp];
+    }
   }
   else {
     const std::string loglevel_conf{Runtime::get("__PROJECTROOT__") +
       "/conf/loglevel.conf"};
     if (File::isFile(loglevel_conf)) {
       short tmp = atoi(File::getContent(loglevel_conf).c_str());
-      if (tmp >= 0 && tmp < LOGLEVELSIZE)
+      if (tmp >= 0 && tmp < LOGLEVELSIZE) {
         // If the requested log level is safe, use it
+        Logger::devel("Using log level provided from configuration");
         loglevel = LogLevels[tmp];
+      }
     }
   }
 
@@ -216,6 +228,7 @@ int prepare_environment(int argc, char* const argv[]) {
     "/conf/modules.conf"
   };
   for (auto i : dirs) {
+    Logger::devel("Creating directory at path \"" + i + "\" ...");
     mkdir((Runtime::get("__PROJECTROOT__") + i).c_str(),
       S_IRWXU | S_IRWXG | S_IRWXO);
     if (!File::isDirectory(Runtime::get("__PROJECTROOT__") + i)) {
@@ -225,6 +238,7 @@ int prepare_environment(int argc, char* const argv[]) {
     }
   }
   for (auto i : files) {
+    Logger::devel("Creating file at path \"" + i + "\" ...");
     File::create(Runtime::get("__PROJECTROOT__") + i);
     if (!File::isFile(Runtime::get("__PROJECTROOT__") + i)) {
       Logger::info("Error creating mandatory file \"" +
@@ -256,6 +270,7 @@ int prepare_environment(int argc, char* const argv[]) {
       Runtime::add("__NAME__", tmp);
   }
   Runtime::add("__NAME__", "modfwango");
+  Logger::devel("Project name set to \"" + Runtime::get("__NAME__") + "\"");
 
   #ifdef __linux__
   // Assign "process" title

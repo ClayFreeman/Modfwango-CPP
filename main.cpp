@@ -240,7 +240,6 @@ int prepare_environment(int argc, char* const argv[]) {
     }
   }
   for (auto i : files) {
-    Logger::devel("Creating file at path \"" + i + "\" ...");
     File::create(Runtime::get("__PROJECTROOT__") + i);
     if (!File::isFile(Runtime::get("__PROJECTROOT__") + i)) {
       Logger::info("Error creating mandatory file \"" +
@@ -282,7 +281,6 @@ int prepare_environment(int argc, char* const argv[]) {
   // Check for process conflicts
   const std::string pidfile = Runtime::get("__PROJECTROOT__") + "/data/" +
     Runtime::get("__NAME__") + ".pid";
-  File::create(pidfile);
   if (File::isFile(pidfile)) {
     Logger::devel("Found PID file \"" + pidfile + "\"");
     const int pid = atoi(File::getContent(pidfile).c_str());

@@ -1,8 +1,8 @@
 /**
- * @file  <class>.cpp
- * @brief <class>
+ * @file  Logger.cpp
+ * @brief Logger
  *
- * Class implementation for <class>
+ * Class implementation for Logger
  *
  * @author     Clay Freeman
  * @date       March 3, 2015
@@ -89,6 +89,13 @@ void Logger::info(const std::string& msg) {
  * @return true if valid, false otherwise
  */
 bool Logger::setMode(short m) {
+  if (m >= LOGLEVEL_SILENT && m <= LOGLEVEL_DEVEL) {
+    Logger::devel("Setting log level to include:");
+    if (m & LOG_INFO)  Logger::devel(" * LOG_INFO");
+    if (m & LOG_STACK) Logger::devel(" * LOG_STACK");
+    if (m & LOG_DEBUG) Logger::devel(" * LOG_DEBUG");
+    if (m & LOG_DEVEL) Logger::devel(" * LOG_DEVEL");
+  }
   return (m >= LOGLEVEL_SILENT && m <= LOGLEVEL_DEVEL) &&
     (Logger::mode = m) >= LOGLEVEL_SILENT;
 }

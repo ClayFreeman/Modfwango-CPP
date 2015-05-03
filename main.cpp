@@ -29,13 +29,16 @@
 
 // Declare helper function prototypes
 void background();
-void prepare_environment(int argc, char* const argv[]);
+int prepare_environment(int argc, char* const argv[]);
 void prepare_runtime();
 void start_runtime();
 
 int main(int argc, char* const argv[]) {
   // Prepare runtime environment variables
-  prepare_environment(argc, argv);
+  int loglevel = prepare_environment(argc, argv);
+
+  // Set the log level
+  Logger::setMode(loglevel);
 
   // Sleep for 10 seconds for testing
   sleep(10);
@@ -127,7 +130,7 @@ void background() {
 //   }
 // }
 
-void prepare_environment(int argc, char* const argv[]) {
+int prepare_environment(int argc, char* const argv[]) {
   // Record the timestamp that Modfwango was started
   Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
 
@@ -146,15 +149,23 @@ void prepare_environment(int argc, char* const argv[]) {
 
   // Declare the project root, which should always be the parent directory of
   // __MODFWANGOROOT__
-  // NOTE:  Maybe verify this better in the future (via symlink)?
   Runtime::add("__PROJECTROOT__", File::directory(
     Runtime::get("__MODFWANGOROOT__")));
+
+  // Exit if theoretical and actual __PROJECTROOT__ differ
+  if (Runtime::get("__PROJECTROOT__") !=
+      File::realPath(File::directory(argv[0]))) {
+    Logger::info("__PROJECTROOT__ does not match the expected directory \"" +
+      File::realPath(File::directory(argv[0])) + "\" - Is Modfwango being " +
+      "launched directly?");
+    exit(-2);
+  }
 
   // Exit if project & Modfwango roots match
   if (Runtime::get("__MODFWANGOROOT__") == Runtime::get("__PROJECTROOT__")) {
     Logger::info("__MODFWANGOROOT__ and __PROJECTROOT__ cannot match (\"" +
       Runtime::get("__MODFWANGOROOT__") + "\")");
-    exit(-2);
+    exit(-3);
   }
 
   // Verify both project & Modfwango roots as safe
@@ -163,42 +174,36 @@ void prepare_environment(int argc, char* const argv[]) {
       std::regex(path_regex))) {
     Logger::info("__PROJECTROOT__ (\"" + Runtime::get("__PROJECTROOT__") +
       "\") is not a safe path.  Root paths must match \"" + path_regex + "\"");
-    exit(-3);
+    exit(-4);
   }
   if (!std::regex_match(Runtime::get("__MODFWANGOROOT__"),
       std::regex(path_regex))) {
     Logger::info("__MODFWANGOROOT__ (\"" + Runtime::get("__MODFWANGOROOT__") +
       "\") is not a safe path.  Root paths must match \"" + path_regex + "\"");
-    exit(-4);
+    exit(-5);
   }
 
   // Change directory to the project root
   chdir(Runtime::get("__PROJECTROOT__").c_str());
 
-  // TODO:  Determine if setting log level should be postponed until runtime
-  // Fetch log level from either CLI or config file
-  short level = -1;
-  if (argc > 1)
-    level = atoi(argv[1]);
+  // Fetch log level from either CLI or config file, otherwise use default
+  short loglevel = Logger::getMode();
+  if (argc > 1) {
+    short tmp = atoi(argv[1]);
+    if (tmp >= 0 && tmp < LOGLEVELSIZE)
+      // If the requested log level is safe, use it
+      loglevel = LogLevels[tmp];
+  }
   else {
     const std::string loglevel_conf{Runtime::get("__PROJECTROOT__") +
       "/conf/loglevel.conf"};
-    if (File::isFile(loglevel_conf))
-      level = atoi(File::getContent(loglevel_conf).c_str());
+    if (File::isFile(loglevel_conf)) {
+      short tmp = atoi(File::getContent(loglevel_conf).c_str());
+      if (tmp >= 0 && tmp < LOGLEVELSIZE)
+        // If the requested log level is safe, use it
+        loglevel = LogLevels[tmp];
+    }
   }
-
-  // Setup an array of possible log levels
-  const int MODESIZE = 5;
-  short modes[MODESIZE] = {
-    LOGLEVEL_SILENT,
-    LOGLEVEL_INFO,
-    LOGLEVEL_STACK,
-    LOGLEVEL_DEBUG,
-    LOGLEVEL_DEVEL
-  };
-
-  // Set the requested log level (contrary to default if valid)
-  if (level >= 0 && level < MODESIZE) Logger::setMode(modes[level]);
 
   // Create mandatory directories/files
   const std::string dirs[] = {
@@ -216,7 +221,7 @@ void prepare_environment(int argc, char* const argv[]) {
     if (!File::isDirectory(Runtime::get("__PROJECTROOT__") + i)) {
       Logger::info("Error creating mandatory directory \"" +
         Runtime::get("__PROJECTROOT__") + i + "\"");
-      exit(-5);
+      exit(-6);
     }
   }
   for (auto i : files) {
@@ -224,7 +229,7 @@ void prepare_environment(int argc, char* const argv[]) {
     if (!File::isFile(Runtime::get("__PROJECTROOT__") + i)) {
       Logger::info("Error creating mandatory file \"" +
         Runtime::get("__PROJECTROOT__") + i + "\"");
-      exit(-6);
+      exit(-7);
     }
   }
 
@@ -235,7 +240,7 @@ void prepare_environment(int argc, char* const argv[]) {
 
   // Check for early exit request
   if (argc > 1 && isalpha(*argv[1])) {
-    std::string s;
+    std::string s(strlen(argv[1]), 0);
     std::transform(argv[1], argv[1] + strlen(argv[1]), s.begin(), tolower);
     if (s == "prelaunch") {
       Logger::info("Exiting early ...");
@@ -252,26 +257,30 @@ void prepare_environment(int argc, char* const argv[]) {
   }
   Runtime::add("__NAME__", "modfwango");
 
-  // Assign "process" title
   #ifdef __linux__
+  // Assign "process" title
   prctl(PR_SET_NAME, Runtime::get("__NAME__").c_str(), 0, 0, 0);
   #endif
 
   // Check for process conflicts
-  if (File::isFile(Runtime::get("__PROJECTROOT__") + "/data/" +
-      Runtime::get("__NAME__") + ".pid")) {
-    if (kill(atoi(File::getContent(Runtime::get("__PROJECTROOT__") + "/data/" +
-        Runtime::get("__NAME__") + ".pid").c_str()), 0) == 0 ||
-        errno == EPERM) {
-      Logger::info("Modfwango is already running");
-      exit(-7);
+  const std::string pidfile = Runtime::get("__PROJECTROOT__") + "/data/" +
+    Runtime::get("__NAME__") + ".pid";
+  File::create(pidfile);
+  if (File::isFile(pidfile)) {
+    Logger::devel("Found PID file \"" + pidfile + "\"");
+    const int pid = atoi(File::getContent(pidfile).c_str());
+    if (pid > 0 && (kill(pid, 0) == 0 || errno == EPERM)) {
+      Logger::info("Modfwango is already running with PID " +
+        std::to_string(pid));
+      exit(-8);
     }
   }
-  if (!File::putContent(Runtime::get("__PROJECTROOT__") + "/data/" +
-      Runtime::get("__NAME__") + ".pid", std::to_string(getpid()))) {
+  if (!File::putContent(pidfile, std::to_string(getpid()))) {
     Logger::info("Error writing PID file");
-    exit(-8);
+    exit(-9);
   }
+
+  return loglevel;
 }
 
 /**

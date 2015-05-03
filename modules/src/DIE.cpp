@@ -1,8 +1,8 @@
 /**
- * @file  <class>.cpp
- * @brief <class>
+ * @file  DIE.cpp
+ * @brief DIE
  *
- * Class implementation for <class>
+ * Class implementation for DIE
  *
  * @author     Clay Freeman
  * @date       March 14, 2015

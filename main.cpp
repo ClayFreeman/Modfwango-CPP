@@ -144,6 +144,7 @@ void prepare_environment(int argc, char* const argv[]) {
 
   // Declare the project root, which should always be the parent directory of
   // __MODFWANGOROOT__
+  // NOTE:  Maybe verify this better in the future (via symlink)?
   Runtime::add("__PROJECTROOT__", File::directory(
     Runtime::get("__MODFWANGOROOT__")));
 
@@ -183,7 +184,7 @@ void prepare_environment(int argc, char* const argv[]) {
       loglevel = atoi(File::getContent(loglevel_conf).c_str());
   }
 
-  // Set the log level (contrary to default if valid)
+  // Setup an array of possible log levels
   const int MODESIZE = 5;
   short modes[MODESIZE] = {
     LOGLEVEL_SILENT,
@@ -192,7 +193,9 @@ void prepare_environment(int argc, char* const argv[]) {
     LOGLEVEL_DEBUG,
     LOGLEVEL_DEVEL
   };
-  Logger::setMode(modes[loglevel]);
+
+  // Set the requested log level (contrary to default if valid)
+  if (loglevel >= 0 && loglevel < MODESIZE) Logger::setMode(modes[loglevel]);
 
   // Create directories/files
   mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),

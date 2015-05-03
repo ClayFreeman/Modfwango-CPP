@@ -29,7 +29,7 @@
 
 // Declare helper function prototypes
 void background();
-int prepare_environment(int argc, char* const argv[]);
+int prepare_environment(int argc, const char* const argv[]);
 void prepare_runtime();
 void start_runtime();
 
@@ -308,6 +308,30 @@ int prepare_environment(int argc, const char* const argv[]) {
   }
 
   return loglevel;
+}
+
+/**
+ * @brief Prepare Runtime
+ *
+ * Set __MODFWANGOVERSION__, brag, and load modules & sockets
+ */
+void prepare_runtime() {
+  // For now, set version explicitly until we have docs/CHANGELOG.md
+  Runtime::add("__MODFWANGOVERSION__", "1.00");
+
+  // Greet the user
+  Logger::info("Welcome to Modfwango!");
+  Logger::info("You're running Modfwango v" +
+    Runtime::get("__MODFWANGOVERSION__"));
+
+  // Load Modules
+  for (auto root : { "__MODFWANGOROOT__", "__PROJECTROOT__" })
+    for (auto module : Utility::explode(File::getContent(
+        Runtime::get(root) + "/conf/modules.conf"), "\n")) {
+      if (module.length() > 0)
+        ModuleManagement::loadModule(Runtime::get(root) + "/modules/src/" +
+          module + ".so");
+    }
 }
 
 /**

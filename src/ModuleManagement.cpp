@@ -91,8 +91,7 @@ std::shared_ptr<Module> ModuleManagement::getModuleByName(
  *
  * @return true on success, false otherwise
  */
-bool ModuleManagement::loadModule(const std::string& name) {
-  std::string path = "modules/src/" + name + ".so";
+bool ModuleManagement::loadModule(const std::string& path) {
   bool status = false;
   Logger::debug("Attempting to load module at path \"" + path + "\" ...");
   std::string e;
@@ -185,10 +184,10 @@ bool ModuleManagement::loadModule(const std::string& name) {
  *
  * @return true on success, false otherwise
  */
-bool ModuleManagement::reloadModule(const std::string& name) {
+bool ModuleManagement::reloadModule(const std::string& path) {
   // Unload the module, then load it again
-  return ModuleManagement::unloadModule(ModuleManagement::getBasename(name)) &&
-    ModuleManagement::loadModule(name);
+  return ModuleManagement::unloadModule(ModuleManagement::getBasename(path)) &&
+    ModuleManagement::loadModule(path);
 }
 
 /**

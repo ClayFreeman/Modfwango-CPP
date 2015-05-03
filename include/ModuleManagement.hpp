@@ -23,11 +23,11 @@ class ModuleManagement {
     static std::map<std::string, std::shared_ptr<ModuleInstance>> modules;
     // Prevent this class from being instantiated
     ModuleManagement() {}
-    static std::string getBasename(const std::string& name);
+    static std::string getBasename(const std::string& path);
   public:
     static std::shared_ptr<Module> getModuleByName(const std::string& name);
-    static bool loadModule(const std::string& name);
-    static bool reloadModule(const std::string& name);
+    static bool loadModule(const std::string& path);
+    static bool reloadModule(const std::string& path);
     static bool unloadModule(const std::string& name);
 };
 

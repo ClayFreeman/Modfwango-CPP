@@ -34,17 +34,15 @@ void prepare_runtime();
 void start_runtime();
 
 int main(int argc, char* const argv[]) {
+  // Welcome the user
+  Logger::info("Welcome to Modfwango!");
+
   // Prepare runtime environment variables
   prepare_environment(argc, argv);
 
   // Sleep for 10 seconds for testing
   sleep(10);
 
-  // // Welcome via console
-  // Logger::info("Welcome to Modfwango!");
-  // Logger::info("You're running Modfwango v" +
-  //   Runtime::get("__MODFWANGOVERSION__"));
-  //
   // // Load configuration
   // load_config();
   //
@@ -203,20 +201,38 @@ void prepare_environment(int argc, char* const argv[]) {
   // Set the requested log level (contrary to default if valid)
   if (loglevel >= 0 && loglevel < MODESIZE) Logger::setMode(modes[loglevel]);
 
-  // Create directories/files
-  mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),
-    S_IRWXU | S_IRWXG | S_IRWXO);
-  mkdir((Runtime::get("__PROJECTROOT__") + "/data").c_str(),
-    S_IRWXU | S_IRWXG | S_IRWXO);
-  mkdir((Runtime::get("__PROJECTROOT__") + "/modules").c_str(),
-    S_IRWXU | S_IRWXG | S_IRWXO);
-  File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
-  File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
+  // Create mandatory directories/files
+  const std::string dirs[] = {
+    "/conf",
+    "/data",
+    "/modules"
+  };
+  const std::string files[] = {
+    "/conf/listen.conf",
+    "/conf/modules.conf"
+  };
+  for (auto i : dirs) {
+    mkdir((Runtime::get("__PROJECTROOT__") + i).c_str(),
+      S_IRWXU | S_IRWXG | S_IRWXO);
+    if (!File::isDirectory(Runtime::get("__PROJECTROOT__") + i)) {
+      Logger::info("Error creating mandatory directory \"" +
+        Runtime::get("__PROJECTROOT__") + i + "\"");
+      exit(-5);
+    }
+  }
+  for (auto i : files) {
+    File::create(Runtime::get("__PROJECTROOT__") + i);
+    if (!File::isFile(Runtime::get("__PROJECTROOT__") + i)) {
+      Logger::info("Error creating mandatory file \"" +
+        Runtime::get("__PROJECTROOT__") + i + "\"");
+      exit(-6);
+    }
+  }
 
   // Warn about non-recommended configuration(s)
   if (File::getContent(Runtime::get("__PROJECTROOT__") +
       "/conf/modules.conf").length() == 0)
-    Logger::info("WARNING:  No modules will be loaded.");
+    Logger::info("WARNING:  No modules will be loaded");
 
   // Check for early exit request
   if (argc > 1 && isalpha(*argv[1])) {
@@ -228,7 +244,7 @@ void prepare_environment(int argc, char* const argv[]) {
     }
   }
 
-  // Load process title from file, or choose default "modfwango"
+  // Load process name from file, or choose default "modfwango"
   if (File::isFile(Runtime::get("__PROJECTROOT__") + "/conf/name.conf")) {
     const std::string tmp{File::getContent(Runtime::get("__PROJECTROOT__") +
       "/conf/name.conf")};
@@ -245,7 +261,17 @@ void prepare_environment(int argc, char* const argv[]) {
   // Check for process conflicts
   if (File::isFile(Runtime::get("__PROJECTROOT__") + "/data/" +
       Runtime::get("__NAME__") + ".pid")) {
-    //
+    if (kill(atoi(File::getContent(Runtime::get("__PROJECTROOT__") + "/data/" +
+        Runtime::get("__NAME__") + ".pid").c_str()), 0) == 0 ||
+        errno == EPERM) {
+      Logger::info("Modfwango is already running");
+      exit(-7);
+    }
+  }
+  if (!File::putContent(Runtime::get("__PROJECTROOT__") + "/data/" +
+      Runtime::get("__NAME__") + ".pid", std::to_string(getpid()))) {
+    Logger::info("Error writing PID file");
+    exit(-8);
   }
 }
 

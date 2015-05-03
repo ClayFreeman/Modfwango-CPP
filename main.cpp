@@ -169,14 +169,14 @@ void prepare_environment(int argc, char* const argv[]) {
   if (argc > 1) {
     // Determine log level from argv
     int level = atoi(argv[1]);
-    if (level >= 0 && level < 5)
+    if (level >= 0 && level < MODESIZE)
       Logger::setMode(modes[level]);
   }
   else if (File::exists(Runtime::get("__PROJECTROOT__") +
       "/conf/loglevel.conf")) {
     int level = atoi(File::getContent(Runtime::get("__PROJECTROOT__") +
       "/conf/loglevel.conf").c_str());
-    if (level >= 0 && level < 5)
+    if (level >= 0 && level < MODESIZE)
       Logger::setMode(modes[level]);
   }
 

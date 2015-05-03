@@ -21,8 +21,11 @@ class File {
     static bool create(const std::string& path);
     static bool remove(const std::string& path);
     static std::string directory(const std::string& path);
+    static bool executable(const std::string& path);
     static bool exists(const std::string& path);
     static std::string getContent(const std::string& path);
+    static bool isDirectory(const std::string& path);
+    static bool isFile(const std::string& path);
     static bool putContent(const std::string& path, const std::string& content,
       bool append = false);
     static bool readable(const std::string& path);

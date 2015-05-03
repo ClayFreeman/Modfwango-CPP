@@ -13,6 +13,7 @@
 #include "../include/Runtime.hpp"
 
 std::map<std::string, std::string> Runtime::options{};
+const std::string Runtime::null_str{};
 
 /**
  * @brief Add
@@ -26,7 +27,7 @@ std::map<std::string, std::string> Runtime::options{};
  */
 bool Runtime::add(const std::string& key, const std::string& value) {
   bool retVal = false;
-  if (Runtime::options.count(key) == 0 || Runtime::options[key].length() == 0) {
+  if (Runtime::options.count(key) == 0) {
     Runtime::options[key] = value;
     retVal = true;
   }
@@ -43,5 +44,6 @@ bool Runtime::add(const std::string& key, const std::string& value) {
  * @return The value
  */
 const std::string& Runtime::get(const std::string& key) {
-  return Runtime::options[key];
+  return (Runtime::options.count(key) > 0 ? Runtime::options[key] :
+    Runtime::null_str);
 }

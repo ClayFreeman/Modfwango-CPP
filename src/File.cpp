@@ -89,6 +89,19 @@ std::string File::directory(const std::string& path) {
 }
 
 /**
+ * @brief Executable
+ *
+ * Checks if the given path is executable by the current process
+ *
+ * @param path The path for which to check access
+ *
+ * @return true if executable, false otherwise
+ */
+bool File::executable(const std::string& path) {
+  return (access(path.c_str(), X_OK) == 0);
+}
+
+/**
  * @brief Exists
  *
  * Checks if a given path exists
@@ -130,6 +143,34 @@ std::string File::getContent(const std::string& path) {
     throw std::runtime_error{"The requested file is not readable"};
   }
   return retVal;
+}
+
+/**
+ * @brief Is Directory
+ *
+ * Checks if the given path is a directory
+ *
+ * @param path The path for which to check
+ *
+ * @return true if directory, false otherwise
+ */
+bool File::isDirectory(const std::string& path) {
+  struct stat buffer;
+  return (stat(path.c_str(), &buffer) == 0 && buffer.st_mode & S_IFDIR);
+}
+
+/**
+ * @brief Is File
+ *
+ * Checks if the given path is a file
+ *
+ * @param path The path for which to check
+ *
+ * @return true if file, false otherwise
+ */
+bool File::isFile(const std::string& path) {
+  struct stat buffer;
+  return (stat(path.c_str(), &buffer) == 0 && buffer.st_mode & S_IFREG);
 }
 
 /**

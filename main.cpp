@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <iostream>
+#include <regex>
 #include <signal.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -25,28 +26,27 @@
 
 // Declare helper function prototypes
 void background();
-void load_config();
-void loop();
 void prepare_environment(int argc, char* const argv[]);
-void signal_handler(int signal);
+void prepare_runtime();
+void start_runtime();
 
 int main(int argc, char* const argv[]) {
   // Prepare runtime environment variables
   prepare_environment(argc, argv);
 
-  // Welcome via console
-  Logger::info("Welcome to Modfwango!");
-  Logger::info("You're running Modfwango v" +
-    Runtime::get("__MODFWANGOVERSION__"));
-
-  // Load configuration
-  load_config();
-
-  // Background the current process if in daemon mode
-  if (Logger::getMode() == LOGLEVEL_SILENT) background();
-
-  // Run main loop
-  loop();
+  // // Welcome via console
+  // Logger::info("Welcome to Modfwango!");
+  // Logger::info("You're running Modfwango v" +
+  //   Runtime::get("__MODFWANGOVERSION__"));
+  //
+  // // Load configuration
+  // load_config();
+  //
+  // // Background the current process if in daemon mode
+  // if (Logger::getMode() == LOGLEVEL_SILENT) background();
+  //
+  // // Run main loop
+  // loop();
 
   return 0;
 }
@@ -58,19 +58,11 @@ int main(int argc, char* const argv[]) {
  */
 void background() {
   // Fork and terminate parent process
-  if (fork() > 0)
-    _exit(0);
-
+  if (fork() > 0) _exit(0);
   // Create a new session
   setsid();
-
   // Fork and terminate parent process
-  if (fork() > 0)
-    _exit(0);
-
-  // Set the current working directory to the project root
-  chdir(Runtime::get("__PROJECTROOT__").c_str());
-
+  if (fork() > 0) _exit(0);
   // Set the user mask to zero
   umask(0);
 
@@ -83,104 +75,139 @@ void background() {
   open("/dev/null", O_RDWR);
 }
 
-void load_config() {
-  // Load Modules
-  for (auto module : Utility::explode(File::getContent(
-      Runtime::get("__PROJECTROOT__") + "/conf/modules.conf"), "\n")) {
-    if (module.length() > 0)
-      ModuleManagement::loadModule(module);
-  }
+// void load_config() {
+//   // Load Modules
+//   for (auto module : Utility::explode(File::getContent(
+//       Runtime::get("__PROJECTROOT__") + "/conf/modules.conf"), "\n")) {
+//     if (module.length() > 0)
+//       ModuleManagement::loadModule(module);
+//   }
+//
+//   // Load Sockets
+//   for (auto socket : Utility::explode(File::getContent(
+//       Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
+//     if (socket.length() > 0) {
+//       std::vector<std::string> v{Utility::explode(socket, ":")};
+//       // We don't support SSL yet ... :(
+//       if (v[1].substr(0, 1) == "+")
+//         v[1].erase(0, 1);
+//       // Create the Socket
+//       SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
+//     }
+//   }
+// }
 
-  // Load Sockets
-  for (auto socket : Utility::explode(File::getContent(
-      Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
-    if (socket.length() > 0) {
-      std::vector<std::string> v{Utility::explode(socket, ":")};
-      // We don't support SSL yet ... :(
-      if (v[1].substr(0, 1) == "+")
-        v[1].erase(0, 1);
-      // Create the Socket
-      SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
-    }
-  }
-}
-
-void loop() {
-  // Loop while there are Connections or Sockets still active and __DIE__ has
-  // not been set
-  while ((ConnectionManagement::count() > 0 || SocketManagement::count() > 0) &&
-      Runtime::get("__DIE__").length() == 0) {
-    // Stall until there is something to do on a Socket or Connection
-    SocketManagement::stall();
-    // Accept any incoming clients (if existent)
-    SocketManagement::acceptConnections();
-    // Prune any closed Connections
-    ConnectionManagement::pruneConnections();
-    // Loop through all active Connections ...
-    for (auto i : ConnectionManagement::getConnections()) {
-      try {
-        // and read data in order to ...
-        const std::string& data = i->getData();
-        if (data.length() > 0)
-          // pass each line of data to EventHandling
-          for (auto d : Utility::explode(data, "\n"))
-            EventHandling::receiveData(i, Utility::trim(d));
-      }
-      catch (const std::runtime_error& e) {
-        Logger::debug(e.what());
-      }
-    }
-  }
-}
+// void loop() {
+//   // Loop while there are Connections or Sockets still active and __DIE__ has
+//   // not been set
+//   while ((ConnectionManagement::count() > 0 || SocketManagement::count() > 0) &&
+//       Runtime::get("__DIE__").length() == 0) {
+//     // Stall until there is something to do on a Socket or Connection
+//     SocketManagement::stall();
+//     // Accept any incoming clients (if existent)
+//     SocketManagement::acceptConnections();
+//     // Prune any closed Connections
+//     ConnectionManagement::pruneConnections();
+//     // Loop through all active Connections ...
+//     for (auto i : ConnectionManagement::getConnections()) {
+//       try {
+//         // and read data in order to ...
+//         const std::string& data = i->getData();
+//         if (data.length() > 0)
+//           // pass each line of data to EventHandling
+//           for (auto d : Utility::explode(data, "\n"))
+//             EventHandling::receiveData(i, Utility::trim(d));
+//       }
+//       catch (const std::runtime_error& e) {
+//         Logger::debug(e.what());
+//       }
+//     }
+//   }
+// }
 
 void prepare_environment(int argc, char* const argv[]) {
-  // Register signal_handler(...) as a callback for SIGINT
-  signal(SIGINT, signal_handler);
+  // Record the timestamp that Modfwango was started
+  Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
 
-  // Setup the global __PROJECTROOT__ variable (safely)
-  if (argc < 1 || !Runtime::add("__PROJECTROOT__", File::directory(
-      File::realPath(argv[0])))) {
-    // Free the third temporary variable
-    throw std::logic_error{
-      "Could not store __PROJECTROOT__ in Runtime instance"
-    };
+  if (argc > 0 && File::isFile(File::realPath(argv[0])) &&
+      File::executable(File::realPath(argv[0])))
+    // Record the full path to the executable
+    Runtime::add("__EXECUTABLE__", File::realPath(argv[0]));
+  else {
+    Logger::info("Could not determine executable path from argv[0]");
+    exit(-1);
   }
 
-  // Prepare environment
-  Runtime::add("__MODFWANGOVERSION__", "1.00");
-  Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
+  // Declare the Modfwango root, which is the parent directory of the executable
+  Runtime::add("__MODFWANGOROOT__", File::directory(
+    Runtime::get("__EXECUTABLE__")));
+
+  // Declare the project root, which should always be the parent directory of
+  // __MODFWANGOROOT__
+  Runtime::add("__PROJECTROOT__", File::directory(
+    Runtime::get("__MODFWANGOROOT__")));
+
+  // Exit if project & Modfwango roots match
+  if (Runtime::get("__MODFWANGOROOT__") == Runtime::get("__PROJECTROOT__")) {
+    Logger::info("__MODFWANGOROOT__ and __PROJECTROOT__ cannot match (\"" +
+      Runtime::get("__MODFWANGOROOT__") + "\")");
+    exit(-2);
+  }
+
+  // Verify both project & Modfwango roots as safe
+  std::string path_regex{"^[a-zA-Z0-9\\/._-]+$"};
+  if (!std::regex_match(Runtime::get("__PROJECTROOT__"),
+      std::regex(path_regex))) {
+    Logger::info("__PROJECTROOT__ (\"" + Runtime::get("__PROJECTROOT__") +
+      "\") is not a safe path.  Root paths must match \"" + path_regex + "\"");
+    exit(-3);
+  }
+  if (!std::regex_match(Runtime::get("__MODFWANGOROOT__"),
+      std::regex(path_regex))) {
+    Logger::info("__MODFWANGOROOT__ (\"" + Runtime::get("__MODFWANGOROOT__") +
+      "\") is not a safe path.  Root paths must match \"" + path_regex + "\"");
+    exit(-4);
+  }
+
+  // Change directory to the project root
+  chdir(Runtime::get("__PROJECTROOT__").c_str());
+
+  // Fetch loglevel from either CLI or config file
+  int loglevel = -1;
+  if (argc > 1)
+    loglevel = atoi(argv[1]);
+  else {
+    const std::string loglevel_conf{Runtime::get("__PROJECTROOT__") +
+      "/conf/loglevel.conf"};
+    if (File::isFile(loglevel_conf))
+      loglevel = atoi(File::getContent(loglevel_conf));
+  }
+
+  // Set the log level (contrary to default if valid)
+  Logger::setLevel(loglevel);
 
   // Create directories/files
   mkdir((Runtime::get("__PROJECTROOT__") + "/conf").c_str(),
     S_IRWXU | S_IRWXG | S_IRWXO);
+  mkdir((Runtime::get("__PROJECTROOT__") + "/data").c_str(),
+    S_IRWXU | S_IRWXG | S_IRWXO);
+  mkdir((Runtime::get("__PROJECTROOT__") + "/modules").c_str(),
+    S_IRWXU | S_IRWXG | S_IRWXO);
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf");
   File::create(Runtime::get("__PROJECTROOT__") + "/conf/modules.conf");
 
-  // Enumerate log levels via array
-  const int MODESIZE = 5;
-  short modes[MODESIZE] = {
-    LOGLEVEL_SILENT,
-    LOGLEVEL_INFO,
-    LOGLEVEL_STACK,
-    LOGLEVEL_DEBUG,
-    LOGLEVEL_DEVEL
-  };
+  // Warn about non-recommended configuration(s)
+  if (File::getContent(Runtime::get("__PROJECTROOT__") +
+      "/conf/modules.conf").length() == 0)
+    Logger::info("WARNING:  No modules will be loaded.");
 
-  if (argc > 1) {
-    // Determine log level from argv
-    int level = atoi(argv[1]);
-    if (level >= 0 && level < MODESIZE)
-      Logger::setMode(modes[level]);
+  // Check for early exit request
+  if (argc > 1 && isalpha(argv[1])) {
+    std::string s;
+    std::transform(argv[1], argv[1] + strlen(argv[1]), s.begin(), tolower);
+    if (s == "prelaunch")
+      exit(0);
   }
-  else if (File::exists(Runtime::get("__PROJECTROOT__") +
-      "/conf/loglevel.conf")) {
-    int level = atoi(File::getContent(Runtime::get("__PROJECTROOT__") +
-      "/conf/loglevel.conf").c_str());
-    if (level >= 0 && level < MODESIZE)
-      Logger::setMode(modes[level]);
-  }
-
-  // Check existing PID, etc
 }
 
 /**

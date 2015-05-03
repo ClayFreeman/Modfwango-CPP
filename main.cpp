@@ -33,7 +33,7 @@ int prepare_environment(int argc, char* const argv[]);
 void prepare_runtime();
 void start_runtime();
 
-int main(int argc, char* const argv[]) {
+int main(int argc, const char* const argv[]) {
   // Prepare runtime environment variables
   int loglevel = prepare_environment(argc, argv);
 
@@ -130,7 +130,22 @@ void background() {
 //   }
 // }
 
-int prepare_environment(int argc, char* const argv[]) {
+/**
+ * @brief Prepare Environment
+ *
+ * Declares Runtime constants required for operation, performs safety and
+ * integrity checks, sets the working directory, determins a user-defined log
+ * level, and creates required files
+ *
+ * @remarks
+ *   In order for this function to finish, Modfwango must be used as a submodule
+ *
+ * @param argc Count of arguments
+ * @param argv Array of C-String arguments
+ *
+ * @return Requested log level
+ */
+int prepare_environment(int argc, const char* const argv[]) {
   // Record the timestamp that Modfwango was started
   Logger::devel("Recording __STARTTIME__ using Unix epoch ...");
   Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
@@ -247,11 +262,6 @@ int prepare_environment(int argc, char* const argv[]) {
       exit(-7);
     }
   }
-
-  // Warn about non-recommended configuration(s)
-  if (File::getContent(Runtime::get("__PROJECTROOT__") +
-      "/conf/modules.conf").length() == 0)
-    Logger::info("WARNING:  No modules will be loaded");
 
   // Check for early exit request
   if (argc > 1 && isalpha(*argv[1])) {

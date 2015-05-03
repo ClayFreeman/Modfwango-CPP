@@ -137,10 +137,11 @@ int prepare_environment(int argc, char* const argv[]) {
 
   Logger::devel("Attempting to find executable path from argv[0] ...");
   const std::string exe{File::realPath(argv[0])};
-  if (argc > 0 && File::isFile(exe) && File::executable(exe))
+  if (argc > 0 && File::isFile(exe) && File::executable(exe)) {
     // Record the full path to the executable
     Logger::devel("Found executable path from argv[0]");
     Runtime::add("__EXECUTABLE__", exe);
+  }
   else {
     Logger::info("Could not determine executable path from argv[0]");
     exit(-1);

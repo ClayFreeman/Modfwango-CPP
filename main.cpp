@@ -38,7 +38,7 @@ int main(int argc, char* const argv[]) {
   prepare_environment(argc, argv);
 
   // Sleep for 10 seconds for testing
-  sleep(10);
+  fork(); sleep(10);
 
   // // Welcome via console
   // Logger::info("Welcome to Modfwango!");

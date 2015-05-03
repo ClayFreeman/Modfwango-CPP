@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "../include/File.hpp"
+#include "../include/Logger.hpp"
 
 /**
  * @brief Name
@@ -28,9 +29,11 @@
  * @return basename of path
  */
 std::string File::name(const std::string& path) {
+  Logger::devel("Calculating basename of path \"" + path + "\" ...");
   char* dup = strdup(path.c_str());
   std::string retVal{basename(dup)};
   free(dup);
+  Logger::devel("Basename computed as \"" + retVal + "\"");
   return retVal;
 }
 
@@ -44,6 +47,7 @@ std::string File::name(const std::string& path) {
  * @return true if created, false otherwise
  */
 bool File::create(const std::string& path) {
+  Logger::devel("Attempting to create file at path \"" + path + "\" ...");
   bool retVal = false;
   if (!File::exists(path)) {
     FILE* fp = fopen(path.c_str(), "w");
@@ -51,7 +55,11 @@ bool File::create(const std::string& path) {
       fclose(fp);
       retVal = true;
     }
+    else
+      Logger::devel("File creation failed:  could not open file");
   }
+  else
+    Logger::devel("File creation failed:  file already exists");
   return retVal;
 }
 
@@ -65,10 +73,13 @@ bool File::create(const std::string& path) {
  * @return true if unlinked, false otherwise
  */
 bool File::remove(const std::string& path) {
+  Logger::devel("Attempting to delete file at path \"" + path + "\" ...");
   bool retVal = false;
   if (File::exists(path)) {
     retVal = unlink(path.c_str()) == 0;
   }
+  else
+    Logger::devel("File deletion failed:  file does not exist");
   return retVal;
 }
 
@@ -82,9 +93,11 @@ bool File::remove(const std::string& path) {
  * @return directory of path
  */
 std::string File::directory(const std::string& path) {
+  Logger::devel("Calculating dirname of path \"" + path + "\" ...");
   char* dup = strdup(path.c_str());
   std::string retVal{dirname(dup)};
   free(dup);
+  Logger::devel("Dirname computed as \"" + retVal + "\"");
   return retVal;
 }
 
@@ -125,6 +138,7 @@ bool File::exists(const std::string& path) {
  * @return content of file at path
  */
 std::string File::getContent(const std::string& path) {
+  Logger::devel("Attempting to read file at path \"" + path + "\" ...");
   std::string retVal;
   if (File::readable(path)) {
     FILE* fp = fopen(path.c_str(), "rb");
@@ -135,13 +149,11 @@ std::string File::getContent(const std::string& path) {
       fread(&retVal[0], 1, retVal.size(), fp);
       fclose(fp);
     }
-    else {
-      throw std::runtime_error{"The requested file is not readable"};
-    }
+    else
+      Logger::devel("File read failed:  could not open file");
   }
-  else {
-    throw std::runtime_error{"The requested file is not readable"};
-  }
+  else
+    Logger::devel("File read failed:  file is not readable");
   return retVal;
 }
 
@@ -186,6 +198,7 @@ bool File::isFile(const std::string& path) {
  */
 bool File::putContent(const std::string& path, const std::string& content,
     bool append) {
+  Logger::devel("Attempting to write file at path \"" + path + "\" ...");
   bool retVal = false;
   if (File::writable(path)) {
     FILE* fp = fopen(path.c_str(), (append == true ? "ab" : "wb"));
@@ -194,7 +207,11 @@ bool File::putContent(const std::string& path, const std::string& content,
       fclose(fp);
       retVal = true;
     }
+    else
+      Logger::devel("File write failed:  could not open file");
   }
+  else
+    Logger::devel("File write failed:  file is not writable");
   return retVal;
 }
 
@@ -221,9 +238,11 @@ bool File::readable(const std::string& path) {
  * @return real path
  */
 std::string File::realPath(const std::string& path) {
+  Logger::devel("Calculating realpath of path \"" + path + "\" ...");
   char* rpath = realpath(path.c_str(), nullptr);
   std::string retVal{rpath};
   free(rpath);
+  Logger::devel("Realpath computed as \"" + retVal + "\"");
   return retVal;
 }
 
@@ -237,6 +256,7 @@ std::string File::realPath(const std::string& path) {
  * @return true if truncated, false otherwise
  */
 bool File::truncate(const std::string& path) {
+  Logger::devel("Attempting to truncate file at path \"" + path + "\" ...");
   return File::putContent(path, std::string{});
 }
 

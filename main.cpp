@@ -31,26 +31,18 @@
 void background();
 int prepare_environment(int argc, const char* const argv[]);
 void prepare_runtime();
-void start_runtime();
+void signal_handler(int signal);
+void start_runtime(int loglevel);
 
 int main(int argc, const char* const argv[]) {
   // Prepare runtime environment variables
   int loglevel = prepare_environment(argc, argv);
 
-  // Set the log level
-  Logger::setMode(loglevel);
+  // Prepare for runtime execution by loading modules and sockets
+  prepare_runtime();
 
-  // Sleep for 10 seconds for testing
-  sleep(10);
-
-  // // Load configuration
-  // load_config();
-  //
-  // // Background the current process if in daemon mode
-  // if (Logger::getMode() == LOGLEVEL_SILENT) background();
-  //
-  // // Run main loop
-  // loop();
+  // Start runtime with the requested log level
+  start_runtime(loglevel);
 
   return 0;
 }
@@ -61,6 +53,7 @@ int main(int argc, const char* const argv[]) {
  * Puts the current running process in the background as a daemon
  */
 void background() {
+  Logger::devel("Daemonizing ...");
   // Fork and terminate parent process
   if (fork() > 0) _exit(0);
   // Create a new session
@@ -78,57 +71,6 @@ void background() {
   open("/dev/null", O_WRONLY);
   open("/dev/null", O_RDWR);
 }
-
-// void load_config() {
-//   // Load Modules
-//   for (auto module : Utility::explode(File::getContent(
-//       Runtime::get("__PROJECTROOT__") + "/conf/modules.conf"), "\n")) {
-//     if (module.length() > 0)
-//       ModuleManagement::loadModule(module);
-//   }
-//
-//   // Load Sockets
-//   for (auto socket : Utility::explode(File::getContent(
-//       Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
-//     if (socket.length() > 0) {
-//       std::vector<std::string> v{Utility::explode(socket, ":")};
-//       // We don't support SSL yet ... :(
-//       if (v[1].substr(0, 1) == "+")
-//         v[1].erase(0, 1);
-//       // Create the Socket
-//       SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
-//     }
-//   }
-// }
-
-// void loop() {
-//   // Loop while there are Connections or Sockets still active and __DIE__ has
-//   // not been set
-//   while ((ConnectionManagement::count() > 0 ||
-//       SocketManagement::count() > 0) &&
-//       Runtime::get("__DIE__").length() == 0) {
-//     // Stall until there is something to do on a Socket or Connection
-//     SocketManagement::stall();
-//     // Accept any incoming clients (if existent)
-//     SocketManagement::acceptConnections();
-//     // Prune any closed Connections
-//     ConnectionManagement::pruneConnections();
-//     // Loop through all active Connections ...
-//     for (auto i : ConnectionManagement::getConnections()) {
-//       try {
-//         // and read data in order to ...
-//         const std::string& data = i->getData();
-//         if (data.length() > 0)
-//           // pass each line of data to EventHandling
-//           for (auto d : Utility::explode(data, "\n"))
-//             EventHandling::receiveData(i, Utility::trim(d));
-//       }
-//       catch (const std::runtime_error& e) {
-//         Logger::debug(e.what());
-//       }
-//     }
-//   }
-// }
 
 /**
  * @brief Prepare Environment
@@ -316,7 +258,7 @@ int prepare_environment(int argc, const char* const argv[]) {
  * Set __MODFWANGOVERSION__, brag, and load modules & sockets
  */
 void prepare_runtime() {
-  // For now, set version explicitly until we have docs/CHANGELOG.md
+  // TODO:  For now, set version explicitly until we have docs/CHANGELOG.md
   Runtime::add("__MODFWANGOVERSION__", "1.00");
 
   // Greet the user
@@ -332,6 +274,19 @@ void prepare_runtime() {
         ModuleManagement::loadModule(Runtime::get(root) + "/modules/src/" +
           module + ".so");
     }
+
+  // Load Sockets
+  for (auto socket : Utility::explode(File::getContent(
+      Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
+    if (socket.length() > 0) {
+      std::vector<std::string> v{Utility::explode(socket, ":")};
+      // We don't support SSL yet ... :(
+      if (v[1].substr(0, 1) == "+")
+        v[1].erase(0, 1);
+      // Create the Socket
+      SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
+    }
+  }
 }
 
 /**
@@ -346,4 +301,49 @@ void signal_handler(int signal) {
   std::cout << "\b\b";
   // Set the __DIE__ constant to trigger a shutdown
   Runtime::add("__DIE__", std::to_string(signal));
+}
+
+/**
+ * @brief Start Runtime
+ *
+ * Backgrounds the process if necessary, or registers a signal handler.  Then,
+ * begins the main loop until there are no more Sockets or Connections, or
+ * __DIE__ has been set
+ *
+ * @param loglevel The log level to set before starting
+ */
+void start_runtime(int loglevel) {
+  // Immediately set the log level
+  Logger::setMode(loglevel);
+  // Go into background if necessary
+  if (Logger::getMode() == 0) background();
+  // Otherwise, register a signal handler
+  else signal(SIGINT, signal_handler);
+
+  // Loop while there are Connections or Sockets still active and __DIE__ has
+  // not been set
+  while ((ConnectionManagement::count() > 0 ||
+      SocketManagement::count() > 0) &&
+      Runtime::get("__DIE__").length() == 0) {
+    // Stall until there is something to do on a Socket or Connection
+    SocketManagement::stall();
+    // Accept any incoming clients (if existent)
+    SocketManagement::acceptConnections();
+    // Prune any closed Connections
+    ConnectionManagement::pruneConnections();
+    // Loop through all active Connections ...
+    for (auto i : ConnectionManagement::getConnections()) {
+      try {
+        // and read data in order to ...
+        const std::string& data = i->getData();
+        if (data.length() > 0)
+          // pass each line of data to EventHandling
+          for (auto d : Utility::explode(data, "\n"))
+            EventHandling::receiveData(i, Utility::trim(d));
+      }
+      catch (const std::runtime_error& e) {
+        Logger::debug(e.what());
+      }
+    }
+  }
 }

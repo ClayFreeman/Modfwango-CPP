@@ -32,8 +32,7 @@ bool DIE::isInstantiated() {
   Logger::stack(__PRETTY_FUNCTION__);
   bool status = true;
 
-  std::vector<std::string> depend{Runtime::get("__MODFWANGOROOT__") +
-    "/modules/src/RawEvent.so"};
+  std::vector<std::string> depend{"RawEvent"};
   for (auto i : depend) {
     ModuleManagement::loadModule(i);
   }

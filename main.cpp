@@ -267,6 +267,9 @@ void prepare_runtime() {
   // TODO:  For now, set version explicitly until we have docs/CHANGELOG.md
   Runtime::add("__MODFWANGOVERSION__", "1.00");
 
+  // Ensure loglevel is set to include LOG_INFO until backgrounded
+  Logger::setMode(Logger::getMode() | LOG_INFO);
+
   // Greet the user
   Logger::info("Welcome to Modfwango!");
   Logger::info("You're running Modfwango v" +

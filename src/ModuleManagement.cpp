@@ -15,6 +15,7 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include "../include/File.hpp"
 #include "../include/Logger.hpp"
 #include "../include/Module.hpp"
 #include "../include/ModuleInstance.hpp"
@@ -39,16 +40,15 @@ std::map<std::string, std::shared_ptr<ModuleInstance>>
  */
 const std::string& ModuleManagement::determineModuleRoot(
     const std::string& name) {
-  const std::string& retVal = Runtime::null_str;
-
   if (File::isFile(Runtime::get("__MODFWANGOROOT__") + "/modules/src/" + name +
       ".so"))
-    retVal = Runtime::get("__MODFWANGOROOT__");
-  else if (File::isFile(Runtime::get("__PROJECTROOT__") + "/modules/src/" +
-      name + ".so"))
-    retVal = Runtime::get("__PROJECTROOT__");
+    return Runtime::get("__MODFWANGOROOT__");
 
-  return retVal;
+  if (File::isFile(Runtime::get("__PROJECTROOT__") + "/modules/src/" +
+      name + ".so"))
+    return Runtime::get("__PROJECTROOT__");
+
+  return Runtime::null_str;
 }
 
 /**

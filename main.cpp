@@ -53,8 +53,9 @@ int main(int argc, const char* const argv[]) {
  * Puts the current running process in the background as a daemon
  */
 void background() {
-  Logger::stack(__PRETTY_FUNCTION__);
   Logger::devel("Daemonizing ...");
+  // Set logging to silent
+  Logger::setMode(LOGLEVEL_SILENT);
   // Fork and terminate parent process
   if (fork() > 0) _exit(0);
   // Create a new session
@@ -71,7 +72,6 @@ void background() {
   open("/dev/null", O_RDONLY);
   open("/dev/null", O_WRONLY);
   open("/dev/null", O_RDWR);
-  Logger::stack(__PRETTY_FUNCTION__, true);
 }
 
 /**

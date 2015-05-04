@@ -53,6 +53,7 @@ int main(int argc, const char* const argv[]) {
  * Puts the current running process in the background as a daemon
  */
 void background() {
+  Logger::stack(__PRETTY_FUNCTION__);
   Logger::devel("Daemonizing ...");
   // Fork and terminate parent process
   if (fork() > 0) _exit(0);
@@ -70,6 +71,7 @@ void background() {
   open("/dev/null", O_RDONLY);
   open("/dev/null", O_WRONLY);
   open("/dev/null", O_RDWR);
+  Logger::stack(__PRETTY_FUNCTION__, true);
 }
 
 /**
@@ -88,6 +90,7 @@ void background() {
  * @return Requested log level
  */
 int prepare_environment(int argc, const char* const argv[]) {
+  Logger::stack(__PRETTY_FUNCTION__);
   // Record the timestamp that Modfwango was started
   Logger::devel("Recording __STARTTIME__ using Unix epoch ...");
   Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
@@ -250,6 +253,7 @@ int prepare_environment(int argc, const char* const argv[]) {
     exit(-9);
   }
 
+  Logger::stack(__PRETTY_FUNCTION__, true);
   return loglevel;
 }
 
@@ -259,6 +263,7 @@ int prepare_environment(int argc, const char* const argv[]) {
  * Set __MODFWANGOVERSION__, brag, and load modules & sockets
  */
 void prepare_runtime() {
+  Logger::stack(__PRETTY_FUNCTION__);
   // TODO:  For now, set version explicitly until we have docs/CHANGELOG.md
   Runtime::add("__MODFWANGOVERSION__", "1.00");
 
@@ -286,6 +291,7 @@ void prepare_runtime() {
       SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
     }
   }
+  Logger::stack(__PRETTY_FUNCTION__, true);
 }
 
 /**

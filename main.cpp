@@ -267,14 +267,12 @@ void prepare_runtime() {
   Logger::info("You're running Modfwango v" +
     Runtime::get("__MODFWANGOVERSION__"));
 
-  // Load Modules.  TODO:  Implement search paths in ModuleManagement.cpp
+  // Load Modules.
   for (auto root : { "__MODFWANGOROOT__", "__PROJECTROOT__" })
     for (auto module : Utility::explode(File::getContent(
-        Runtime::get(root) + "/conf/modules.conf"), "\n")) {
+        Runtime::get(root) + "/conf/modules.conf"), "\n"))
       if (module.length() > 0)
-        ModuleManagement::loadModule(Runtime::get(root) + "/modules/src/" +
-          module + ".so");
-    }
+        ModuleManagement::loadModule(module);
 
   // Load Sockets
   for (auto socket : Utility::explode(File::getContent(

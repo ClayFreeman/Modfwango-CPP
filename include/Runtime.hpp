@@ -17,10 +17,10 @@
 class Runtime {
   private:
     static std::map<std::string, std::string> options;
-    static const std::string null_str;
     // Prevent this class from being instantiated
     Runtime() {}
   public:
+    static const std::string null_str;
     static bool add(const std::string& key, const std::string& value);
     static const std::string& get(const std::string& key);
 };

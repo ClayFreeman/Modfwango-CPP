@@ -24,9 +24,37 @@ std::map<std::string, std::shared_ptr<ModuleInstance>>
   ModuleManagement::modules{};
 
 /**
+ * @brief Determine Module Root
+ *
+ * Determines the (core-prioritized) root for a given module name
+ *
+ * @remarks
+ * Module names that exist in Modfwango core overshadow those that exist in the
+ * project root with the same name
+ *
+ * @param name The name of the Module
+ *
+ * @return reference to a std::string to the root directory
+ */
+const std::string& ModuleManagement::determineModuleRoot(
+    const std::string& name) {
+  const std::string& retVal = Runtime::null_str;
+
+  if (File::isFile(Runtime::get("__MODFWANGOROOT__") + "/modules/src/" + name +
+      ".so"))
+    retVal = Runtime::get("__MODFWANGOROOT__");
+  else if (File::isFile(Runtime::get("__PROJECTROOT__") + "/modules/src/" +
+      name + ".so"))
+    retVal = Runtime::get("__PROJECTROOT__");
+
+  return retVal;
+}
+
+/**
  * @brief Get Basename
  *
  * Fetches the basename of the provided path
+ * TODO: Rewrite to use File(?) interface
  *
  * @remarks
  * This method discards the ".so" file extension
@@ -80,21 +108,30 @@ std::shared_ptr<Module> ModuleManagement::getModuleByName(
 /**
  * @brief Load Module
  *
- *   Dynamically loads a shared object, fetches an instance of the Module within
+ * Dynamically loads a shared object, fetches an instance of the Module within
  * it, and attempts to initialize it.  Upon success, it is added to the internal
  * vector of loaded modules
+ * TODO: Check sandbox of path
  *
  * @remarks
  * Will throw either a std::runtime_error or std::logic_error on failure
  *
- * @param name A path to the shared object
+ * @param name The name of the Module
  *
  * @return true on success, false otherwise
  */
-bool ModuleManagement::loadModule(const std::string& path) {
+bool ModuleManagement::loadModule(const std::string& name) {
+  std::string path = ModuleManagement::determineModuleRoot(name);
+  if (path.length() > 0)
+    path += "/modules/src/" + name + ".so";
+  else {
+    const std::string e{"A module with the provided name does not exist"};
+    Logger::debug("Unable to load module named \"" + name + "\"");
+    Logger::debug(e);
+    throw std::runtime_error(e);
+  }
   bool status = false;
   Logger::debug("Attempting to load module at path \"" + path + "\" ...");
-  std::string e;
   if (!ModuleManagement::getModuleByName(ModuleManagement::getBasename(path))) {
     // Attempt to load the requested shared object
     void* obj = dlopen(path.c_str(), RTLD_NOW);
@@ -125,49 +162,37 @@ bool ModuleManagement::loadModule(const std::string& path) {
             Logger::info("Loaded Module \"" + module->getName() + "\"");
           }
           else {
-            Logger::debug("Unable to load module \""
-              + ModuleManagement::getBasename(module->getName()) + "\"");
-
-            e = "Module refused to load during \"" + module->getName() +
-              "::isInstantiated()\"";
+            const std::string e{"Module refused to load during \"" +
+              module->getName() + "::isInstantiated()\""};
+            Logger::debug("Unable to load module \"" + module->getName() +
+              "\"");
             Logger::debug(e);
-
-            // Unload the module
             ModuleManagement::unloadModule(module->getName());
-
             throw std::logic_error(e);
           }
         }
         else {
           if (module != nullptr) delete module;
           dlclose(obj);
-
+          const std::string e{"Internal logic error in module at path \"" +
+            path + "\" during _load()"};
           Logger::debug("Unable to load module at path \"" + path + "\"");
-
-          e = "Internal logic error in module at path \"" + path +
-            "\" during _load()";
           Logger::debug(e);
           throw std::logic_error(e);
         }
       }
       else {
         dlclose(obj);
-
+        const std::string e{err};
         Logger::debug("Unable to load module at path \"" + path + "\"");
-
-        // Handle errors fetching a pointer
-        e = err;
         Logger::debug(e);
         throw std::runtime_error(e);
       }
     }
     else {
       // Handle miscellaneous errors
-      const char* err = dlerror();
-
+      const std::string e{dlerror()};
       Logger::debug("Unable to load module at path \"" + path + "\"");
-
-      e = err;
       Logger::debug(e);
       throw std::runtime_error(e);
     }
@@ -180,14 +205,14 @@ bool ModuleManagement::loadModule(const std::string& path) {
  *
  * Attempts to reload a Module
  *
- * @param name A path to the shared object
+ * @param name The name of the Module
  *
  * @return true on success, false otherwise
  */
-bool ModuleManagement::reloadModule(const std::string& path) {
+bool ModuleManagement::reloadModule(const std::string& name) {
   // Unload the module, then load it again
-  return ModuleManagement::unloadModule(ModuleManagement::getBasename(path)) &&
-    ModuleManagement::loadModule(path);
+  return ModuleManagement::unloadModule(name) &&
+    ModuleManagement::loadModule(name);
 }
 
 /**

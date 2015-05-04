@@ -19,6 +19,7 @@
 #include "../include/Module.hpp"
 #include "../include/ModuleInstance.hpp"
 #include "../include/ModuleManagement.hpp"
+#include "../include/Runtime.hpp"
 
 std::map<std::string, std::shared_ptr<ModuleInstance>>
   ModuleManagement::modules{};

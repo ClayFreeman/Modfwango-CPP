@@ -244,6 +244,7 @@ int prepare_environment(int argc, const char* const argv[]) {
   }
 
   // Exit if unable to write PID to file
+  File::create(pidfile);
   if (!File::putContent(pidfile, std::to_string(getpid()))) {
     Logger::info("Error writing PID file");
     exit(-9);

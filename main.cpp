@@ -30,19 +30,19 @@
 // Declare helper function prototypes
 void background();
 int prepare_environment(int argc, const char* const argv[]);
-void prepare_runtime();
+void prepare_runtime(int loglevel);
 void signal_handler(int signal);
-void start_runtime(int loglevel);
+void start_runtime();
 
 int main(int argc, const char* const argv[]) {
   // Prepare runtime environment variables
   int loglevel = prepare_environment(argc, argv);
 
   // Prepare for runtime execution by loading modules and sockets
-  prepare_runtime();
+  prepare_runtime(loglevel);
 
-  // Start runtime with the requested log level
-  start_runtime(loglevel);
+  // Start runtime loop
+  start_runtime();
 
   return 0;
 }
@@ -78,7 +78,7 @@ void background() {
  * @brief Prepare Environment
  *
  * Declares Runtime constants required for operation, performs safety and
- * integrity checks, sets the working directory, determins a user-defined log
+ * integrity checks, sets the working directory, determines a user-defined log
  * level, and creates required files
  *
  * @remarks
@@ -260,9 +260,11 @@ int prepare_environment(int argc, const char* const argv[]) {
 /**
  * @brief Prepare Runtime
  *
- * Set __MODFWANGOVERSION__, brag, and load modules & sockets
+ * Set __MODFWANGOVERSION__, brag, load modules & sockets, and set log level
+ *
+ * @param loglevel The log level to set before starting
  */
-void prepare_runtime() {
+void prepare_runtime(int loglevel) {
   Logger::stack(__PRETTY_FUNCTION__);
   // TODO:  For now, set version explicitly until we have docs/CHANGELOG.md
   Runtime::add("__MODFWANGOVERSION__", "1.00");
@@ -294,6 +296,10 @@ void prepare_runtime() {
       SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
     }
   }
+
+  // Set the log level
+  Logger::setMode(loglevel);
+
   Logger::stack(__PRETTY_FUNCTION__, true);
 }
 
@@ -317,12 +323,8 @@ void signal_handler(int signal) {
  * Backgrounds the process if necessary, or registers a signal handler.  Then,
  * begins the main loop until there are no more Sockets or Connections, or
  * __DIE__ has been set
- *
- * @param loglevel The log level to set before starting
  */
-void start_runtime(int loglevel) {
-  // Immediately set the log level
-  Logger::setMode(loglevel);
+void start_runtime() {
   // Go into background if necessary
   if (Logger::getMode() == 0) background();
   // Otherwise, register a signal handler

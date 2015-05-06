@@ -13,6 +13,7 @@
 #include <iostream>
 #include <regex>
 #include <signal.h>
+#include <string.h>
 #ifdef __linux__
 #include <sys/prctl.h>
 #endif
@@ -314,7 +315,8 @@ void signal_handler(int signal) {
   // Mask ^C character
   std::cout << "\b\b";
   // Inform the user of signal
-  Logger::info("Caught signal " + std::to_string(signal) + ": Exiting ...");
+  Logger::info("Caught signal " + strsignal(signal) + " (" +
+    std::to_string(signal) + "): Exiting ...");
   // Set the __DIE__ constant to trigger a shutdown
   Runtime::add("__DIE__", std::to_string(signal));
 }

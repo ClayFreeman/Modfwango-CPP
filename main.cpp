@@ -266,12 +266,12 @@ int prepare_environment(int argc, const char* const argv[]) {
  * @param loglevel The log level to set before starting
  */
 void prepare_runtime(int loglevel) {
+  // Ensure loglevel is set to include LOG_INFO until backgrounded
+  Logger::setMode(Logger::getMode() | LOG_INFO);
+
   Logger::stack(__PRETTY_FUNCTION__);
   // TODO:  For now, set version explicitly until we have docs/CHANGELOG.md
   Runtime::add("__MODFWANGOVERSION__", "1.00");
-
-  // Ensure loglevel is set to include LOG_INFO until backgrounded
-  Logger::setMode(Logger::getMode() | LOG_INFO);
 
   // Greet the user
   Logger::info("Welcome to Modfwango!");

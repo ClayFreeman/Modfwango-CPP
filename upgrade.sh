@@ -15,4 +15,8 @@ git pull origin master
 git submodule update --init
 
 # Rebuild Modfwango
-make -j${CORES} clean all
+if [ "${1}" = "" ]; then
+  make -j${CORES} clean all
+else
+  make -j${CORES} clean ${1}
+fi

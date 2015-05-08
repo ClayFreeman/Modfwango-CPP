@@ -315,8 +315,8 @@ void signal_handler(int signal) {
   // Mask ^C character
   std::cout << "\b\b";
   // Inform the user of signal
-  Logger::info("Caught signal " + std::string{strsignal(signal)} + " (" +
-    std::to_string(signal) + "): Exiting ...");
+  Logger::info("Caught signal (" + std::string{strsignal(signal)} +
+    "): Exiting ...");
   // Set the __DIE__ constant to trigger a shutdown
   Runtime::add("__DIE__", std::to_string(signal));
 }

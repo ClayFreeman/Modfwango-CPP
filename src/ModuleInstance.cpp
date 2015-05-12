@@ -19,8 +19,8 @@
  *
  * Constructs a ModuleInstance with a Module and its associated shared object
  *
- * @param parameter1 description of parameter1
- * @param parameter2 parameter2 is an output parameter.
+ * @param m std::shared_ptr to the instantiated Module
+ * @param o std::shared_ptr to the handle returned by dlopen(...)
  */
 ModuleInstance::ModuleInstance(const std::shared_ptr<Module>& m,
   const std::shared_ptr<void>& o): module{m}, object{o} {}

@@ -2,7 +2,7 @@
  * @file  main.cpp
  * @brief Modfwango
  *
- * A test driver for the Modfwango-C++ framework
+ * Holds the main function to facilitate the startup routine for Modfwango core
  *
  * @author     Clay Freeman
  * @date       January 23, 2015
@@ -83,7 +83,7 @@ void background() {
  * level, and creates required files
  *
  * @remarks
- *   In order for this function to finish, Modfwango must be used as a submodule
+ * In order for this function to finish, Modfwango must be used as a submodule
  *
  * @param argc Count of arguments
  * @param argv Array of C-String arguments

@@ -30,9 +30,10 @@ std::map<std::string, std::shared_ptr<Event>> EventHandling::events{};
  *
  * @param name         The name of the Event to be created
  * @param parentModule The name of the owning Module (can be empty if created
- *   by the framework, default = "")
+ *                     by the framework, default = "")
  * @param callback     An optional function pointer to a function that accepts
- *   the Event name and data for processing (default = nullptr)
+ *                     the Event name and data for processing (default =
+ *                     nullptr)
  *
  * @return true if the Event was created, false otherwise
  */
@@ -98,14 +99,14 @@ void EventHandling::receiveData(const std::shared_ptr<Connection>& c,
  *
  * @param name         The name of the Event in which to register
  * @param parentModule The name of the owning Module (can be empty if created
- *   by the framework, default = "")
+ *                     by the framework, default = "")
  * @param callback     A function pointer to a function that accepts the Event
- *   name and optional data for processing
+ *                     name and optional data for processing
  * @param priority     The priority of the registration (ascending priority,
- *   default = 0)
+ *                     default = 0)
  *
  * @return true if the Event was found and registration succeeded, false
- *   otherwise
+ *         otherwise
  */
 bool EventHandling::registerForEvent(const std::string& name,
     const std::string& parentModule, void (*callback)(const std::string&,
@@ -137,19 +138,19 @@ bool EventHandling::registerForEvent(const std::string& name,
  * triggered
  *
  * @remarks
- *   The provided callback should return true if the Event trigger can
- *   proceed, false otherwise
+ * The provided callback should return true if the Event trigger can proceed,
+ * false otherwise
  *
  * @param name         The name of the Event in which to register
  * @param parentModule The name of the owning Module (can be empty if created
- *   by the framework, default = "")
+ *                     by the framework, default = "")
  * @param callback     A function pointer to a function that accepts the Event
- *   name
+ *                     name
  * @param priority     The priority of the registration (ascending priority,
- *   default = 0)
+ *                     default = 0)
  *
  * @return true if the Event was found and registration succeeded, false
- *   otherwise
+ *         otherwise
  */
 bool EventHandling::registerPreprocessorForEvent(const std::string& name,
     const std::string& parentModule, bool (*callback)(const std::string&),
@@ -180,7 +181,7 @@ bool EventHandling::registerPreprocessorForEvent(const std::string& name,
  *
  * @param name The name of the Event to be triggered
  * @param data The optional data to be included to each registration's
- *   callback
+ *             callback
  *
  * @return true if the Event was found and triggered, false otherwise
  */
@@ -223,7 +224,7 @@ bool EventHandling::unregisterEvents(const std::string& parentModule) {
  * @param parentModule The name of the owning Module
  *
  * @return true if the Event was found and Module unregistered, false
- *   otherwise
+ *         otherwise
  */
 bool EventHandling::unregisterForEvent(const std::string& name,
     const std::string& parentModule) {
@@ -247,7 +248,7 @@ bool EventHandling::unregisterForEvent(const std::string& name,
  * @param parentModule The name of the owning Module
  *
  * @return true if the Event was found and Module unregistered, false
- *   otherwise
+ *         otherwise
  */
 bool EventHandling::unregisterPreprocessorForEvent(const std::string& name,
     const std::string& parentModule) {
@@ -270,7 +271,7 @@ bool EventHandling::unregisterPreprocessorForEvent(const std::string& name,
  * @param parentModule The name of the owning Module
  *
  * @return true if the Events were found and Module unregistered, false
- *   otherwise
+ *         otherwise
  */
 bool EventHandling::unregisterModule(const std::string& parentModule) {
   bool status = false;

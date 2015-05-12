@@ -27,8 +27,8 @@
  *
  * Constructs a Socket to listen on the provided address and port number
  *
- * @param parameter1 description of parameter1
- * @param parameter2 parameter2 is an output parameter.
+ * @param addr   The address to listen from on the socket
+ * @param portno The port number to listen on the socket
  */
 Socket::Socket(const std::string& addr, int portno): host{addr}, port{portno} {
   // Prepare the listen address

@@ -18,10 +18,10 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include "../ext/Utility/Utility.hpp"
 #include "../include/Connection.hpp"
 #include "../include/FileDescriptor.hpp"
 #include "../include/Logger.hpp"
-#include "../include/Utility.hpp"
 
 /**
  * @brief Destructor

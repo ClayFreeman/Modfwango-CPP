@@ -19,14 +19,14 @@
 #endif
 #include <sys/stat.h>
 #include <unistd.h>
+#include "ext/File/File.hpp"
+#include "ext/Utility/Utility.hpp"
 #include "include/ConnectionManagement.hpp"
 #include "include/EventHandling.hpp"
-#include "include/File.hpp"
 #include "include/Logger.hpp"
 #include "include/ModuleManagement.hpp"
 #include "include/Runtime.hpp"
 #include "include/SocketManagement.hpp"
-#include "include/Utility.hpp"
 
 // Declare helper function prototypes
 void background();

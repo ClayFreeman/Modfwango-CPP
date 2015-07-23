@@ -11,8 +11,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "../ext/Utility/Utility.hpp"
 #include "../include/Logger.hpp"
-#include "../include/Utility.hpp"
 
 short Logger::mode = (DEBUG == 1 ? LOGLEVEL_DEVEL : LOGLEVEL_SILENT);
 short Logger::indent = 0;

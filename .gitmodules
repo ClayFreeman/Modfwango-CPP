@@ -1,3 +1,9 @@
-[submodule ".Makefile"]
-	path = .Makefile
-	url = https://github.com/ClayFreeman/Makefile.git
+[submodule "ext/File"]
+	path = ext/File
+	url = https://github.com/clayfreeman/File.git
+[submodule "ext/Makefile"]
+	path = ext/Makefile
+	url = https://github.com/clayfreeman/Makefile.git
+[submodule "ext/Utility"]
+	path = ext/Utility
+	url = https://github.com/clayfreeman/Utility.git

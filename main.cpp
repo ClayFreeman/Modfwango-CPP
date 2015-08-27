@@ -104,6 +104,7 @@ int prepare_environment(int argc, const char* const argv[]) {
   }
   else {
     Logger::info("Could not determine executable path from argv[0]");
+    Logger::info("std::string exe: " + exe);
     exit(1);
   }
 

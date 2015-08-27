@@ -95,7 +95,7 @@ int prepare_environment(int argc, const char* const argv[]) {
   Runtime::add("__STARTTIME__", std::to_string(time(nullptr)));
 
   Logger::devel("Attempting to find executable path from argv[0] ...");
-  const std::string exe{File::realPath(argv[0])};
+  std::string exe{File::realPath(argv[0])};
   if (argc > 0 && File::isFile(exe) && File::executable(exe)) {
     // Record the full path to the executable
     Logger::devel("Found executable path from argv[0]");
@@ -119,7 +119,7 @@ int prepare_environment(int argc, const char* const argv[]) {
 
   // Exit if theoretical and actual __PROJECTROOT__ differ
   Logger::devel("Checking validity of __PROJECTROOT__ ...");
-  const std::string theoretical_root = File::realPath(File::directory(argv[0]));
+  std::string theoretical_root = File::realPath(File::directory(argv[0]));
   if (Runtime::get("__PROJECTROOT__") != theoretical_root) {
     Logger::info("__PROJECTROOT__ does not match the expected directory \"" +
       theoretical_root + "\" - Is Modfwango being launched directly?");

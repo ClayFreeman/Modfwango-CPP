@@ -35,7 +35,8 @@
 #define LOGLEVEL_DEVEL  15 // [0x1111] Show all output
 
 // Setup an array of possible log levels
-const short LogLevels[] = {
+const int LOGLEVELSIZE  = 5;
+const short LogLevels[LOGLEVELSIZE] = {
   LOGLEVEL_SILENT,
   LOGLEVEL_INFO,
   LOGLEVEL_STACK,

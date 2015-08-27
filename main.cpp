@@ -104,7 +104,7 @@ int prepare_environment(int argc, const char* const argv[]) {
   }
   else {
     Logger::info("Could not determine executable path from argv[0]");
-    exit(-1);
+    exit(1);
   }
 
   // Declare the Modfwango root, which is the parent directory of the executable
@@ -124,7 +124,7 @@ int prepare_environment(int argc, const char* const argv[]) {
   if (Runtime::get("__PROJECTROOT__") != theoretical_root) {
     Logger::info("__PROJECTROOT__ does not match the expected directory \"" +
       theoretical_root + "\" - Is Modfwango being launched directly?");
-    exit(-2);
+    exit(2);
   }
 
   // Exit if project & Modfwango roots match
@@ -132,7 +132,7 @@ int prepare_environment(int argc, const char* const argv[]) {
   if (Runtime::get("__MODFWANGOROOT__") == Runtime::get("__PROJECTROOT__")) {
     Logger::info("__MODFWANGOROOT__ and __PROJECTROOT__ cannot match (\"" +
       Runtime::get("__MODFWANGOROOT__") + "\")");
-    exit(-3);
+    exit(3);
   }
 
   // Verify both project & Modfwango roots as safe
@@ -142,13 +142,13 @@ int prepare_environment(int argc, const char* const argv[]) {
       std::regex(path_regex))) {
     Logger::info("__PROJECTROOT__ (\"" + Runtime::get("__PROJECTROOT__") +
       "\") is not a safe path.  Root paths must match \"" + path_regex + "\"");
-    exit(-4);
+    exit(4);
   }
   if (!std::regex_match(Runtime::get("__MODFWANGOROOT__"),
       std::regex(path_regex))) {
     Logger::info("__MODFWANGOROOT__ (\"" + Runtime::get("__MODFWANGOROOT__") +
       "\") is not a safe path.  Root paths must match \"" + path_regex + "\"");
-    exit(-5);
+    exit(5);
   }
 
   // Change directory to the project root
@@ -196,7 +196,7 @@ int prepare_environment(int argc, const char* const argv[]) {
     if (!File::isDirectory(Runtime::get("__PROJECTROOT__") + i)) {
       Logger::info("Error creating mandatory directory \"" +
         Runtime::get("__PROJECTROOT__") + i + "\"");
-      exit(-6);
+      exit(6);
     }
   }
   for (auto i : files) {
@@ -204,7 +204,7 @@ int prepare_environment(int argc, const char* const argv[]) {
     if (!File::isFile(Runtime::get("__PROJECTROOT__") + i)) {
       Logger::info("Error creating mandatory file \"" +
         Runtime::get("__PROJECTROOT__") + i + "\"");
-      exit(-7);
+      exit(7);
     }
   }
 
@@ -242,7 +242,7 @@ int prepare_environment(int argc, const char* const argv[]) {
     if (pid > 0 && (kill(pid, 0) == 0 || errno == EPERM)) {
       Logger::info("Modfwango is already running with PID " +
         std::to_string(pid));
-      exit(-8);
+      exit(8);
     }
   }
 
@@ -250,7 +250,7 @@ int prepare_environment(int argc, const char* const argv[]) {
   File::create(pidfile);
   if (!File::putContent(pidfile, std::to_string(getpid()))) {
     Logger::info("Error writing PID file");
-    exit(-9);
+    exit(9);
   }
 
   Logger::stack(__PRETTY_FUNCTION__, true);

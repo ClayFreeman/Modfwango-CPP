@@ -11,8 +11,6 @@
 #ifndef _CONNECTION_H
 #define _CONNECTION_H
 
-#include <errno.h>
-#include <fcntl.h>
 #include <memory>
 #include <string>
 #include "FileDescriptor.hpp"

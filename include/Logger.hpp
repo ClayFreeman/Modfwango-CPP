@@ -11,6 +11,8 @@
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
+#include <string>
+
 // Used internally for console color codes
 #define COLOR_INFO  "\x1b[32;01m" // Green
 #define COLOR_DEBUG "\x1b[33;01m" // Yellow
@@ -33,8 +35,7 @@
 #define LOGLEVEL_DEVEL  15 // [0x1111] Show all output
 
 // Setup an array of possible log levels
-const int   LOGLEVELSIZE            = 5;
-const short LogLevels[LOGLEVELSIZE] = {
+const short LogLevels[] = {
   LOGLEVEL_SILENT,
   LOGLEVEL_INFO,
   LOGLEVEL_STACK,

@@ -11,8 +11,6 @@
 #ifndef _SOCKET_H
 #define _SOCKET_H
 
-#include <errno.h>
-#include <fcntl.h>
 #include <memory>
 #include <string>
 #include "Connection.hpp"

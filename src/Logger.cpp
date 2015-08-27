@@ -14,7 +14,7 @@
 #include "../ext/Utility/Utility.hpp"
 #include "../include/Logger.hpp"
 
-short Logger::mode = (DEBUG == 1 ? LOGLEVEL_DEVEL : LOGLEVEL_SILENT);
+short Logger::mode = (DEBUG == 1 ? LOGLEVEL_DEVEL : LOGLEVEL_INFO);
 short Logger::indent = 0;
 
 /**

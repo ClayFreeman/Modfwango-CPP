@@ -280,23 +280,25 @@ void prepare_runtime(int loglevel) {
 
   // Load Modules.
   for (auto root : { "__MODFWANGOROOT__", "__PROJECTROOT__" })
-    for (auto module : Utility::explode(File::getContent(
-        Runtime::get(root) + "/conf/modules.conf"), "\n"))
-      if (module.length() > 0)
-        ModuleManagement::loadModule(module);
+    if (File::isFile(Runtime::get(root) + "/conf/modules.conf"))
+      for (auto module : Utility::explode(File::getContent(
+          Runtime::get(root) + "/conf/modules.conf"), "\n"))
+        if (module.length() > 0)
+          ModuleManagement::loadModule(module);
 
   // Load Sockets
-  for (auto socket : Utility::explode(File::getContent(
-      Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
-    if (socket.length() > 0) {
-      std::vector<std::string> v{Utility::explode(socket, ",")};
-      // We don't support SSL yet ... :(
-      if (v[1].substr(0, 1) == "+")
-        v[1].erase(0, 1);
-      // Create the Socket
-      SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
+  if (File::isFile(Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"))
+    for (auto socket : Utility::explode(File::getContent(
+        Runtime::get("__PROJECTROOT__") + "/conf/listen.conf"), "\n")) {
+      if (socket.length() > 0) {
+        std::vector<std::string> v{Utility::explode(socket, ",")};
+        // We don't support SSL yet ... :(
+        if (v[1].substr(0, 1) == "+")
+          v[1].erase(0, 1);
+        // Create the Socket
+        SocketManagement::newSocket(v[0], atoi(v[1].c_str()));
+      }
     }
-  }
 
   // Set the log level
   Logger::setMode(loglevel);

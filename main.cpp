@@ -67,10 +67,11 @@ void background() {
   umask(0);
 
   // Open standard fds to /dev/null
-  int devNull = open("/dev/null", O_RDWR);
-  dup2(devNull, STDIN_FILENO);
-  dup2(devNull, STDOUT_FILENO);
-  dup2(devNull, STDERR_FILENO);
+  int devNullRD = open("/dev/null", O_RDONLY);
+  int devNullWR = open("/dev/null", O_WRONLY);
+  dup2(devNullRD, STDIN_FILENO);
+  dup2(devNullWR, STDOUT_FILENO);
+  dup2(devNullWR, STDERR_FILENO);
 }
 
 /**

@@ -49,7 +49,7 @@ class Logger {
     static short mode;
     static short indent;
     // Prevent this class from being instantiated
-    Logger() {}
+    Logger() { bool unused; LogLevels[0] ? unused = true : false; }
   public:
     static void  debug(const std::string& msg);
     static void  devel(const std::string& msg);
